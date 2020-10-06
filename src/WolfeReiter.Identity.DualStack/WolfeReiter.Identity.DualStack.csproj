@@ -6,5 +6,11 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.8" Condition="'$(Configuration)' == 'Debug'" />
+    <PackageReference Include="Microsoft.Identity.Web" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Identity.Web.UI" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\lib\wolfereiter-graph-claimstranform\src\WolfeReiter.Identity.Claims\WolfeReiter.Identity.Claims.csproj" />
   </ItemGroup>
 </Project>
