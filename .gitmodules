@@ -1,0 +1,6 @@
+[submodule "src/WolfeReiter.Identity.DualStack/lib/wolfereiter-graph-claimstranform"]
+	path = src/WolfeReiter.Identity.DualStack/lib/wolfereiter-graph-claimstranform
+	url = https://github.com/WolfeReiter/wolfereiter-graph-claimstranform.git
+[submodule "lib/wolfereiter-graph-claimstranform"]
+	path = lib/wolfereiter-graph-claimstranform
+	url = https://github.com/WolfeReiter/wolfereiter-graph-claimstranform.git
