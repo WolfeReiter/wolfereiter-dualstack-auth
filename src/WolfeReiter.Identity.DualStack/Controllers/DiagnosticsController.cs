@@ -14,9 +14,9 @@ namespace WolfeReiter.Identity.DualStack.Controllers
     [Authorize]
     public class DiagnosticsController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ILogger<DiagnosticsController> _logger;
 
-        public DiagnosticsController(ILogger<HomeController> logger)
+        public DiagnosticsController(ILogger<DiagnosticsController> logger)
         {
             _logger = logger;
         }
