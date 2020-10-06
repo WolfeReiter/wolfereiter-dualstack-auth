@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -44,11 +45,20 @@ namespace WolfeReiter.Identity.DualStack
                 options.Configuration = "host:4445";
             });
             */
+            
             // Sign-in users with the Microsoft identity platform
             services.AddMicrosoftIdentityWebAppAuthentication(Configuration)
                 .EnableTokenAcquisitionToCallDownstreamApi(new string[] { "User.Read", "Directory.Read.All" })
                 .AddDistributedTokenCaches();
             services.AddWolfeReiterAzureGroupsClaimsTransform(Configuration);
+
+            //sign-in with forms and cookies
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            });
+            
             services.AddHealthChecks();
             services.AddControllersWithViews()
                 .AddMicrosoftIdentityUI();
