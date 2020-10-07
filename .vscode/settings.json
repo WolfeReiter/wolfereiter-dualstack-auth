@@ -1,0 +1,28 @@
+{
+    "sqltools.connections": [
+        {
+            "database": "wr_dualstack",
+            "driver": "PostgreSQL",
+            "name": "PgSql:wr_dualstack",
+            "password": "T2ie7yd1aHBw6MImg02e2tJdKmU9xeUGftaB5sN3ZGhMUdq2qI",
+            "port": 5432,
+            "server": "localhost",
+            "username": "wr_dualstack"
+        },
+        {
+            "mssqlOptions": {
+                "appName": "SQLTools",
+                "useUTC": true,
+                "encrypt": true
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 1433,
+            "driver": "MSSQL",
+            "name": "SqlServer:wr_dualstack",
+            "database": "WR_DUALSTACK",
+            "username": "sa",
+            "password": "YkBkKCta6zNhlp6buYMAf6tmjjSl4WkIj0R8BfrCXA1zjjQ4PM"
+        }
+    ]
+}

@@ -7,11 +7,13 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
+using WolfeReiter.Identity.Data;
 
 namespace WolfeReiter.Identity.DualStack
 {
@@ -28,6 +30,13 @@ namespace WolfeReiter.Identity.DualStack
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services = Configuration.GetValue<string>("EntityFramework:Driver") switch
+            {
+                "PostgreSql" => services.AddDbContext<PgSqlContext>(options => options.UseNpgsql(Configuration.GetConnectionString("PgSqlConnection"))),
+                "SqlServer"  => services.AddDbContext<SqlServerContext>(options => options.UseSqlServer(Configuration.GetConnectionString("SqlServerConnection"))),
+                _ => throw new InvalidOperationException("The EntityFramework:Driver configuration value must be set to \"PostgreSQL\" or \"SqlServer\"."),
+            };
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -58,11 +67,10 @@ namespace WolfeReiter.Identity.DualStack
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             });
-            
+
             services.AddHealthChecks();
             services.AddControllersWithViews()
                 .AddMicrosoftIdentityUI();
-
             var mvcBuilder = services.AddRazorPages();
 #if DEBUG
             //Razor runtime compilation only on DEBUG build.
@@ -72,7 +80,6 @@ namespace WolfeReiter.Identity.DualStack
                 mvcBuilder.AddRazorRuntimeCompilation();
             }
 #endif
-
             services.AddSingleton<SmtpClientService>(new SmtpClientService(Configuration));
         }
 
@@ -104,6 +111,15 @@ namespace WolfeReiter.Identity.DualStack
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
+
+            using var scope         = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
+            using DbContext context = (Configuration.GetValue<string>("EntityFramework:Driver")) switch
+            {
+                "PostgreSql" => scope.ServiceProvider.GetService<PgSqlContext>(),
+                "SqlServer"  => scope.ServiceProvider.GetService<SqlServerContext>(),
+                _ => throw new InvalidOperationException("The EntityFramework:Driver configuration value must be set to \"PostgreSQL\" or \"SqlServer\"."),
+            };
+            context.Database.Migrate();
         }
     }
 }

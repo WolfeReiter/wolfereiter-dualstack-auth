@@ -7,11 +7,15 @@
   <ItemGroup>
     <PackageReference Include="MailKit" Version="2.9.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.8" Condition="'$(Configuration)' == 'Debug'" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.8" />
     <PackageReference Include="Microsoft.Identity.Web" Version="1.0.0" />
     <PackageReference Include="Microsoft.Identity.Web.UI" Version="1.0.0" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.1.4" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\lib\wolfereiter-graph-claimstranform\src\WolfeReiter.Identity.Claims\WolfeReiter.Identity.Claims.csproj" />
+    <ProjectReference Include="..\WolfeReiter.Identity.Data\WolfeReiter.Identity.Data.csproj" />
   </ItemGroup>
 </Project>
