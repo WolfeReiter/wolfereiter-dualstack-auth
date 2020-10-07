@@ -34,7 +34,7 @@ namespace WolfeReiter.Identity.DualStack
             {
                 "PostgreSql" => services.AddDbContext<PgSqlContext>(options => options.UseNpgsql(Configuration.GetConnectionString("PgSqlConnection"))),
                 "SqlServer"  => services.AddDbContext<SqlServerContext>(options => options.UseSqlServer(Configuration.GetConnectionString("SqlServerConnection"))),
-                _ => throw new InvalidOperationException("The EntityFramework:Driver configuration value must be set to \"PostgreSQL\" or \"SqlServer\"."),
+                _ => throw new InvalidOperationException("The EntityFramework:Driver configuration value must be set to \"PostgreSql\" or \"SqlServer\"."),
             };
 
             services.Configure<CookiePolicyOptions>(options =>
@@ -117,7 +117,7 @@ namespace WolfeReiter.Identity.DualStack
             {
                 "PostgreSql" => scope.ServiceProvider.GetService<PgSqlContext>(),
                 "SqlServer"  => scope.ServiceProvider.GetService<SqlServerContext>(),
-                _ => throw new InvalidOperationException("The EntityFramework:Driver configuration value must be set to \"PostgreSQL\" or \"SqlServer\"."),
+                _ => throw new InvalidOperationException("The EntityFramework:Driver configuration value must be set to \"PostgreSql\" or \"SqlServer\"."),
             };
             context.Database.Migrate();
         }
