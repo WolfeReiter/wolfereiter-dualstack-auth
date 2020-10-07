@@ -27,7 +27,7 @@
                 "EntityFramework__Driver": "PostgreSql"
             },
             "sourceFileMap": {
-                "/Views": "${workspaceFolder}/Views"
+                "/Views": "${workspaceFolder}/src/WolfeReiter.Identity.DualStack/Views"
             }
         },
         {
@@ -53,7 +53,7 @@
                 "EntityFramework__Driver": "SqlServer"
             },
             "sourceFileMap": {
-                "/Views": "${workspaceFolder}/Views"
+                "/Views": "${workspaceFolder}/src/WolfeReiter.Identity.DualStack/Views"
             }
         },
         {
