@@ -3,7 +3,7 @@
 Use the `--context` and `--output-dir` arguments with `dotnet ef migrations`
 
 ```
-[master] $ dotnet ef migrations add InitialCreate --context PgSqlContext --output-dir Migrations/PgSqlMigrations -v
+[master] $ dotnet ef migrations add InitialCreate --context PgSqlContext --output-dir Migrations/PgSqlMigrations
 Build started...
 Build succeeded.
 Done. To undo this action, use 'ef migrations remove'
