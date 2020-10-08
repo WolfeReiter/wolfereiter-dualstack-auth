@@ -24,5 +24,9 @@
             "username": "sa",
             "password": "YkBkKCta6zNhlp6buYMAf6tmjjSl4WkIj0R8BfrCXA1zjjQ4PM"
         }
+    ],
+    "cSpell.words": [
+        "Npgsql",
+        "hsts"
     ]
 }
