@@ -12,6 +12,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web;
 using WolfeReiter.Identity.DualStack.Models;
+using WolfeReiter.Identity.DualStack.Security;
 
 namespace WolfeReiter.Identity.DualStack.Controllers
 {
@@ -19,10 +20,14 @@ namespace WolfeReiter.Identity.DualStack.Controllers
     {
         private readonly ILogger<AccountController> _logger;
         private readonly IDistributedCache Cache;
-        public AccountController(ILogger<AccountController> logger, IDistributedCache cache)
+        private readonly CryptoService Crypto;
+        private readonly SmtpClientService SmtpClient;
+        public AccountController(ILogger<AccountController> logger, IDistributedCache cache, CryptoService crypto, SmtpClientService smtpClient)
         {
-            _logger = logger;
-            Cache   = cache;
+            _logger    = logger;
+            Cache      = cache;
+            Crypto     = crypto;
+            SmtpClient = smtpClient;
         }
 
         public async Task<IActionResult> SignIn()

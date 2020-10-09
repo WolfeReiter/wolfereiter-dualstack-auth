@@ -1,0 +1,1 @@
+Tool to 1-way encrypt a password with pbkdf2. Useful for manually generating passwords to insert into the User table.

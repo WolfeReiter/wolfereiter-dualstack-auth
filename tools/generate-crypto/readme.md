@@ -1,0 +1,1 @@
+Generate an RSA key pair and an AES key both encoded in base64 as json for use as cryptographic material in appsettings.json.

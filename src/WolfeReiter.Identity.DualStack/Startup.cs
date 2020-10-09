@@ -14,6 +14,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using WolfeReiter.Identity.Data;
+using WolfeReiter.Identity.DualStack.Security;
 
 namespace WolfeReiter.Identity.DualStack
 {
@@ -81,6 +82,7 @@ namespace WolfeReiter.Identity.DualStack
             }
 #endif
             services.AddSingleton<SmtpClientService>(new SmtpClientService(Configuration));
+            services.AddSingleton<CryptoService>(new CryptoService(Configuration));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
