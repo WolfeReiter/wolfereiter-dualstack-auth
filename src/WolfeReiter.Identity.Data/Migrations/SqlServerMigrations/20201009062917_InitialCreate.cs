@@ -1,8 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace WolfeReiter.Identity.Data.Migrations.PgSqlMigrations
+namespace WolfeReiter.Identity.Data.Migrations.SqlServerMigrations
 {
     public partial class InitialCreate : Migration
     {
@@ -13,7 +12,7 @@ namespace WolfeReiter.Identity.Data.Migrations.PgSqlMigrations
                 columns: table => new
                 {
                     role_id = table.Column<Guid>(nullable: false),
-                    name = table.Column<string>(nullable: true)
+                    name = table.Column<string>(maxLength: 250, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -26,7 +25,7 @@ namespace WolfeReiter.Identity.Data.Migrations.PgSqlMigrations
                 {
                     user_id = table.Column<Guid>(nullable: false),
                     user_number = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     name = table.Column<string>(maxLength: 50, nullable: false),
                     given_name = table.Column<string>(maxLength: 50, nullable: true),
                     surname = table.Column<string>(maxLength: 50, nullable: true),

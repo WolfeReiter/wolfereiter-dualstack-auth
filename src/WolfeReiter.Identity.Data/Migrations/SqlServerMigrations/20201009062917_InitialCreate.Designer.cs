@@ -10,7 +10,7 @@ using WolfeReiter.Identity.Data;
 namespace WolfeReiter.Identity.Data.Migrations.SqlServerMigrations
 {
     [DbContext(typeof(SqlServerContext))]
-    [Migration("20201007114710_InitialCreate")]
+    [Migration("20201009062917_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -29,8 +29,10 @@ namespace WolfeReiter.Identity.Data.Migrations.SqlServerMigrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnName("name")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(250)")
+                        .HasMaxLength(250);
 
                     b.HasKey("RoleId")
                         .HasName("pk_roles");

@@ -10,7 +10,7 @@ using WolfeReiter.Identity.Data;
 namespace WolfeReiter.Identity.Data.Migrations.PgSqlMigrations
 {
     [DbContext(typeof(PgSqlContext))]
-    [Migration("20201007114644_InitialCreate")]
+    [Migration("20201009062902_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -29,8 +29,10 @@ namespace WolfeReiter.Identity.Data.Migrations.PgSqlMigrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnName("name")
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(250)")
+                        .HasMaxLength(250);
 
                     b.HasKey("RoleId")
                         .HasName("pk_roles");

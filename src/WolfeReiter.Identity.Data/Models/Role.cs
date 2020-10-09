@@ -16,6 +16,8 @@ namespace WolfeReiter.Identity.Data.Models
         [Required]
         public Guid RoleId { get; set; }
 
+        [Required]
+        [MaxLength(250)]
         public string Name { get; set; }
 
         public IList<UserRole> UserRoles { get; set; }

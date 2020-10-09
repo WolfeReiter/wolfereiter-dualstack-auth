@@ -27,8 +27,10 @@ namespace WolfeReiter.Identity.Data.Migrations.PgSqlMigrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnName("name")
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(250)")
+                        .HasMaxLength(250);
 
                     b.HasKey("RoleId")
                         .HasName("pk_roles");

@@ -27,8 +27,10 @@ namespace WolfeReiter.Identity.Data.Migrations.SqlServerMigrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnName("name")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(250)")
+                        .HasMaxLength(250);
 
                     b.HasKey("RoleId")
                         .HasName("pk_roles");
