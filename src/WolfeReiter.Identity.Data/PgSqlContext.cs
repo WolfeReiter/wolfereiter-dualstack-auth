@@ -11,9 +11,5 @@ namespace WolfeReiter.Identity.Data
         public PgSqlContext(DbContextOptions<PgSqlContext> options) : base(options)
         {
         }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSnakeCaseNamingConvention();
-        }
     }
 }
