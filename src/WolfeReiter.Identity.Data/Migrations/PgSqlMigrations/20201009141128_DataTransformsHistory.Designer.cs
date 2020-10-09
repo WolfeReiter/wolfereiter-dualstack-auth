@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WolfeReiter.Identity.Data;
@@ -9,9 +10,10 @@ using WolfeReiter.Identity.Data;
 namespace WolfeReiter.Identity.Data.Migrations.PgSqlMigrations
 {
     [DbContext(typeof(PgSqlContext))]
-    partial class PgSqlContextModelSnapshot : ModelSnapshot
+    [Migration("20201009141128_DataTransformsHistory")]
+    partial class DataTransformsHistory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

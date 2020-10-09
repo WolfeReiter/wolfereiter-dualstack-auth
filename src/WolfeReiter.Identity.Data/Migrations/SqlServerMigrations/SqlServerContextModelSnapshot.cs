@@ -19,6 +19,23 @@ namespace WolfeReiter.Identity.Data.Migrations.SqlServerMigrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("WolfeReiter.Identity.Data.Models.DataTransformsHistory", b =>
+                {
+                    b.Property<string>("TransformId")
+                        .HasColumnName("transform_id")
+                        .HasColumnType("nvarchar(150)")
+                        .HasMaxLength(150);
+
+                    b.Property<DateTime>("Applied")
+                        .HasColumnName("applied")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("TransformId")
+                        .HasName("pk_data_transforms_history");
+
+                    b.ToTable("data_transforms_history");
+                });
+
             modelBuilder.Entity("WolfeReiter.Identity.Data.Models.Role", b =>
                 {
                     b.Property<Guid>("RoleId")

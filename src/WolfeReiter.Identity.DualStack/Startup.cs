@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using WolfeReiter.Identity.Data;
@@ -86,7 +87,7 @@ namespace WolfeReiter.Identity.DualStack
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public async void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
             if (env.IsDevelopment())
             {
@@ -114,14 +115,18 @@ namespace WolfeReiter.Identity.DualStack
                 endpoints.MapRazorPages();
             });
 
-            using var scope         = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
-            using DbContext context = (Configuration.GetValue<string>("EntityFramework:Driver")) switch
+            using var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
+            using SharedDbContext context = (Configuration.GetValue<string>("EntityFramework:Driver")) switch
             {
                 "PostgreSql" => scope.ServiceProvider.GetService<PgSqlContext>(),
                 "SqlServer"  => scope.ServiceProvider.GetService<SqlServerContext>(),
                 _ => throw new InvalidOperationException("The EntityFramework:Driver configuration value must be set to \"PostgreSql\" or \"SqlServer\"."),
             };
+
             context.Database.Migrate();
+            var transformer = new DbDataTransformer(Configuration, env, context);
+            int rowsAffected = await transformer.ApplyStartupTransformAsync();
+            logger.Log(LogLevel.Information, $"DbDataTransformer.ApplyStartupTransformAsync() affected {rowsAffected} rows.");
         }
     }
 }
