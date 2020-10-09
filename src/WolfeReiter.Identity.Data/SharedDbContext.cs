@@ -7,9 +7,9 @@ namespace WolfeReiter.Identity.Data
     /// <summary>
     /// Configuration shared by all providers, pgsql and sqlserver.
     /// </summary>
-    public abstract class SharedDbContex : DbContext
+    public abstract class SharedDbContext : DbContext
     {
-        public SharedDbContex(DbContextOptions options) : base(options)
+        public SharedDbContext(DbContextOptions options) : base(options)
         {
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
