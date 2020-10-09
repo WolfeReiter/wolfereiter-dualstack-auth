@@ -17,6 +17,21 @@ namespace WolfeReiter.Identity.Data
             optionsBuilder.UseSnakeCaseNamingConvention();
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>().HasIndex(x => x.Name).IsUnique();
+
+            modelBuilder.Entity<UserRole>()
+                .HasOne<User>(x => x.User)
+                .WithMany(x => x.UserRoles)
+                .HasForeignKey(x => x.UserId);
+
+            modelBuilder.Entity<UserRole>()
+                .HasOne<Role>(x => x.Role)
+                .WithMany(x => x.UserRoles)
+                .HasForeignKey(x => x.RoleId);
+        }
+
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }

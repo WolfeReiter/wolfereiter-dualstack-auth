@@ -125,6 +125,10 @@ namespace WolfeReiter.Identity.Data.Migrations.PgSqlMigrations
                     b.HasKey("UserId")
                         .HasName("pk_users");
 
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasName("ix_users_name");
+
                     b.ToTable("users");
                 });
 

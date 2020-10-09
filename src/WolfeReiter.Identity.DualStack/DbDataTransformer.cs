@@ -57,6 +57,8 @@ namespace WolfeReiter.Identity.DualStack
 
             if (!DbContext.DataTransformsHistory.Where(x => x.TransformId == transformId).Any())
             {
+                DbContext.DataTransformsHistory.Add(new DataTransformsHistory { TransformId = transformId });
+                
                 var administratorRoleId = DbContext.Roles
                     .Where(x => x.Name == Security.Roles.Administrator)
                     .Select(x => x.RoleId)

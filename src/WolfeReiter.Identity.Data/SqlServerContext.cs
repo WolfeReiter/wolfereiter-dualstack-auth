@@ -1,5 +1,6 @@
 using System;
 using Microsoft.EntityFrameworkCore;
+using WolfeReiter.Identity.Data.Models;
 
 namespace WolfeReiter.Identity.Data
 {
@@ -10,6 +11,11 @@ namespace WolfeReiter.Identity.Data
     {
         public SqlServerContext(DbContextOptions<SqlServerContext> options) : base(options)
         {
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

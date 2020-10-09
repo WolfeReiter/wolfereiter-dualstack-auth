@@ -2,33 +2,35 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WolfeReiter.Identity.Data;
 
-namespace WolfeReiter.Identity.Data.Migrations.SqlServerMigrations
+namespace WolfeReiter.Identity.Data.Migrations.PgSqlMigrations
 {
-    [DbContext(typeof(SqlServerContext))]
-    partial class SqlServerContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(PgSqlContext))]
+    [Migration("20201009151517_UniqueUserNameAndForeignKeys")]
+    partial class UniqueUserNameAndForeignKeys
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
                 .HasAnnotation("ProductVersion", "3.1.8")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             modelBuilder.Entity("WolfeReiter.Identity.Data.Models.DataTransformsHistory", b =>
                 {
                     b.Property<string>("TransformId")
                         .HasColumnName("transform_id")
-                        .HasColumnType("nvarchar(150)")
+                        .HasColumnType("character varying(150)")
                         .HasMaxLength(150);
 
                     b.Property<DateTime>("Applied")
                         .HasColumnName("applied")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("TransformId")
                         .HasName("pk_data_transforms_history");
@@ -41,12 +43,12 @@ namespace WolfeReiter.Identity.Data.Migrations.SqlServerMigrations
                     b.Property<Guid>("RoleId")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("role_id")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnName("name")
-                        .HasColumnType("nvarchar(250)")
+                        .HasColumnType("character varying(250)")
                         .HasMaxLength(250);
 
                     b.HasKey("RoleId")
@@ -60,67 +62,67 @@ namespace WolfeReiter.Identity.Data.Migrations.SqlServerMigrations
                     b.Property<Guid>("UserId")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("user_id")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("Active")
                         .HasColumnName("active")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime>("Created")
                         .HasColumnName("created")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnName("email")
-                        .HasColumnType("nvarchar(100)")
+                        .HasColumnType("character varying(100)")
                         .HasMaxLength(100);
 
                     b.Property<int>("FailedLoginAttempts")
                         .HasColumnName("failed_login_attempts")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("GivenName")
                         .HasColumnName("given_name")
-                        .HasColumnType("nvarchar(50)")
+                        .HasColumnType("character varying(50)")
                         .HasMaxLength(50);
 
                     b.Property<byte[]>("Hash")
                         .IsRequired()
                         .HasColumnName("hash")
-                        .HasColumnType("varbinary(32)")
+                        .HasColumnType("bytea")
                         .HasMaxLength(32);
 
                     b.Property<DateTime?>("LastLoginAttempt")
                         .HasColumnName("last_login_attempt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("Locked")
                         .HasColumnName("locked")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnName("name")
-                        .HasColumnType("nvarchar(50)")
+                        .HasColumnType("character varying(50)")
                         .HasMaxLength(50);
 
                     b.Property<byte[]>("Salt")
                         .IsRequired()
                         .HasColumnName("salt")
-                        .HasColumnType("varbinary(32)")
+                        .HasColumnType("bytea")
                         .HasMaxLength(32);
 
                     b.Property<string>("Surname")
                         .HasColumnName("surname")
-                        .HasColumnType("nvarchar(50)")
+                        .HasColumnType("character varying(50)")
                         .HasMaxLength(50);
 
                     b.Property<int>("UserNumber")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("user_number")
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
                     b.HasKey("UserId")
                         .HasName("pk_users");
@@ -137,15 +139,15 @@ namespace WolfeReiter.Identity.Data.Migrations.SqlServerMigrations
                     b.Property<Guid>("UserRoleId")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("user_role_id")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("RoleId")
                         .HasColumnName("role_id")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("UserId")
                         .HasColumnName("user_id")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.HasKey("UserRoleId")
                         .HasName("pk_user_roles");
