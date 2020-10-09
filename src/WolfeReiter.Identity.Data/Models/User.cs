@@ -45,6 +45,7 @@ namespace WolfeReiter.Identity.Data.Models
         [Required]
         [MaxLength(256 / 8)]
         public byte[] Salt { get; set; }
+        
         [Required]
         public DateTime Created { get; set; }
 
