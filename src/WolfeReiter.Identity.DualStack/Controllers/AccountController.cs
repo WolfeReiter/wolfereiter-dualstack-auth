@@ -30,8 +30,10 @@ namespace WolfeReiter.Identity.DualStack.Controllers
             SmtpClient = smtpClient;
         }
 
-        public async Task<IActionResult> SignIn()
+        public async Task<IActionResult> SignIn(string? returnUrl)
         {
+            returnUrl ??= "/";
+            
             //TODO: Implement local database sign-in.
             var claims = new List<Claim>
             {
@@ -50,13 +52,14 @@ namespace WolfeReiter.Identity.DualStack.Controllers
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 new ClaimsPrincipal(identity));
 
-            return LocalRedirect("~/");
+            return LocalRedirect($"~{returnUrl}");
         }
 
         // </Account/Login?ReturnUrl=url> is baked-in for Cookie authentication challenge
         [Route("/Account/Login/")]
-        public IActionResult SignInMethod()
+        public IActionResult SignInMethod(string? returnUrl)
         {
+            ViewBag.ReturnUrl = returnUrl;
             return View();
         }
 
@@ -67,7 +70,7 @@ namespace WolfeReiter.Identity.DualStack.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("/Account/SignOut/")]
-        public async Task<IActionResult> SignOut(string scheme)
+        public async Task<IActionResult> SignOut(string? scheme)
         {
             if (User != null && User.GetObjectId() != null)
             {
