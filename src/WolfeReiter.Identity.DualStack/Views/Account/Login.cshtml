@@ -1,0 +1,48 @@
+@using WolfeReiter.Identity.DualStack.Models
+@model LoginViewModel
+
+@{
+    ViewData["Title"] = "Login";
+}
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h1 class="display-6">Log in</h1>
+        </div>
+    </div>
+    <div class="row justify-content-center">  
+        <div class="col-md-6">
+            <form asp-action="Login" asp-controller="Account" asp-antiforgery="true">
+                <div asp-validation-summary="ModelOnly"></div>
+                <div class="form-group">
+                    <label asp-for="Username" class="control-label"></label>
+                    <input asp-for="Username" class="form-control" />
+                    <span asp-validation-for="Username"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Password" class="control-label"></label>
+                    <input asp-for="Password" class="form-control"/>
+                    <span asp-validation-for="Password"></span>
+                </div>
+                <div class="form-group">
+                    <button type="submit"class="btn btn-primary btn-block">Log in</button>
+                </div>
+                <input asp-for="RedirectUrl" type="hidden" />
+            </form>
+
+            <hr />
+            
+            <div class="form-group">
+                <a asp-action="Forgot" class="btn btn-outline-secondary btn-block">Reset Password</a>
+            </div>
+            @if(ViewBag.EnableSelfEnrollment != null && ViewBag.EnableSelfEnrollment)
+            {
+            <div class="form-group">
+                <a asp-action="Enroll" class="btn btn-outline-secondary btn-block">Register</a>
+            </div>
+            }
+        </div>
+    </div>
+
+@section Scripts {
+   @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

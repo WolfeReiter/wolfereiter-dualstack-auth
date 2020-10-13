@@ -12,7 +12,7 @@ using WolfeReiter.Identity.DualStack.Models;
 namespace WolfeReiter.Identity.DualStack.Controllers
 {
 
-    [Authorize(Roles = "Administrator")]
+    [Authorize]
     public class DiagnosticsController : Controller
     {
         private readonly ILogger<DiagnosticsController> _logger;
@@ -56,6 +56,12 @@ namespace WolfeReiter.Identity.DualStack.Controllers
             {
                 return Content($"{ex.Message}\r\n\r\n{ex.StackTrace}");
             }
+        }
+
+        [Authorize(Roles = "85de0d3fb8f54ebb94e9cc6747545271")] //fake role
+        public IActionResult Denied()
+        {
+            return Content("You should not see this message.");
         }
     }
 }

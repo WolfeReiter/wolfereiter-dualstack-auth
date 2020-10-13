@@ -34,8 +34,8 @@ namespace WolfeReiter.Identity.DualStack
         {
             services = Configuration.GetValue<string>("EntityFramework:Driver") switch
             {
-                "PostgreSql" => services.AddDbContext<PgSqlContext>(options => options.UseNpgsql(Configuration.GetConnectionString("PgSqlConnection"))),
-                "SqlServer"  => services.AddDbContext<SqlServerContext>(options => options.UseSqlServer(Configuration.GetConnectionString("SqlServerConnection"))),
+                "PostgreSql" => services.AddDbContext<SharedDbContext>(options => options.UseNpgsql(Configuration.GetConnectionString("PgSqlConnection"))),
+                "SqlServer"  => services.AddDbContext<SharedDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("SqlServerConnection"))),
                 _ => throw new InvalidOperationException("The EntityFramework:Driver configuration value must be set to \"PostgreSql\" or \"SqlServer\"."),
             };
 
@@ -123,13 +123,7 @@ namespace WolfeReiter.Identity.DualStack
             });
 
             using var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
-            using SharedDbContext context = (Configuration.GetValue<string>("EntityFramework:Driver")) switch
-            {
-                "PostgreSql" => scope.ServiceProvider.GetService<PgSqlContext>(),
-                "SqlServer"  => scope.ServiceProvider.GetService<SqlServerContext>(),
-                _ => throw new InvalidOperationException("The EntityFramework:Driver configuration value must be set to \"PostgreSql\" or \"SqlServer\"."),
-            };
-
+            using SharedDbContext context = scope.ServiceProvider.GetService<SharedDbContext>();
             context.Database.Migrate();
             var transformer = new DbDataTransformer(Configuration, env, context);
             int rowsAffected = await transformer.ApplyStartupTransformAsync();
