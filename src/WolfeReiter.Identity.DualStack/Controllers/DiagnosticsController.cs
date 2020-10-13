@@ -12,7 +12,7 @@ using WolfeReiter.Identity.DualStack.Models;
 namespace WolfeReiter.Identity.DualStack.Controllers
 {
 
-    [Authorize]
+    [Authorize(Roles = "Administrator")]
     public class DiagnosticsController : Controller
     {
         private readonly ILogger<DiagnosticsController> _logger;

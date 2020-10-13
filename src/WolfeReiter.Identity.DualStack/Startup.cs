@@ -70,6 +70,13 @@ namespace WolfeReiter.Identity.DualStack
                 options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             });
 
+            services.ConfigureApplicationCookie(options => {
+                options.LoginPath = "/Account/SignInMethod"; //override default /Account/Login
+                //TODO: Account/Denied
+                //options.AccessDeniedPath = "/Account/Denied"; //override default /MicrosoftIdentity/Account/Denied
+                options.LogoutPath = "/Account/SignOut";
+            });
+
             services.AddHealthChecks();
             services.AddControllersWithViews()
                 .AddMicrosoftIdentityUI();

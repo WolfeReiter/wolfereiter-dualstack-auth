@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
@@ -16,6 +17,7 @@ using WolfeReiter.Identity.DualStack.Security;
 
 namespace WolfeReiter.Identity.DualStack.Controllers
 {
+    [Authorize(/*Policy = Policies.Administration*/)]
     public class AccountController : Controller
     {
         private readonly ILogger<AccountController> _logger;
@@ -30,9 +32,19 @@ namespace WolfeReiter.Identity.DualStack.Controllers
             SmtpClient = smtpClient;
         }
 
-        public async Task<IActionResult> SignIn(string? returnUrl)
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult Login(string? returnUrl)
         {
-            returnUrl ??= "/";
+            if (User.Identity.IsAuthenticated) return  RedirectFromLogin(returnUrl);
+
+            return View(new LoginViewModel { RedirectUrl = returnUrl });
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> Login(LoginViewModel model)
+        {
             
             //TODO: Implement local database sign-in.
             var claims = new List<Claim>
@@ -52,11 +64,15 @@ namespace WolfeReiter.Identity.DualStack.Controllers
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 new ClaimsPrincipal(identity));
 
+            return RedirectFromLogin();
+        }
+
+        IActionResult RedirectFromLogin(string? returnUrl = null)
+        {
+            returnUrl ??= "/";
             return LocalRedirect($"~{returnUrl}");
         }
 
-        // </Account/Login?ReturnUrl=url> is baked-in for Cookie authentication challenge
-        [Route("/Account/Login/")]
         public IActionResult SignInMethod(string? returnUrl)
         {
             ViewBag.ReturnUrl = returnUrl;
@@ -69,6 +85,7 @@ namespace WolfeReiter.Identity.DualStack.Controllers
         /// <param name="scheme"></param>
         /// <returns></returns>
         [HttpGet]
+        [AllowAnonymous]
         [Route("/Account/SignOut/")]
         public async Task<IActionResult> SignOut(string? scheme)
         {
@@ -93,6 +110,7 @@ namespace WolfeReiter.Identity.DualStack.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult SignedOut()
         {
             if (User?.Identity?.IsAuthenticated ?? false)
