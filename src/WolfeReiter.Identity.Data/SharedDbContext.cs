@@ -11,6 +11,10 @@ namespace WolfeReiter.Identity.Data
     {
         public SharedDbContext(DbContextOptions options) : base(options)
         {
+            Users                 = Set<User>();
+            Roles                 = Set<Role>();
+            UserRoles             = Set<UserRole>();
+            DataTransformsHistory = Set<DataTransformsHistory>();
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

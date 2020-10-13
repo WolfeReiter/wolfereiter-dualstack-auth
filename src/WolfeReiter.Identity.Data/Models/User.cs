@@ -14,6 +14,9 @@ namespace WolfeReiter.Identity.Data.Models
             Active              = true;
             FailedLoginAttempts = 0;
             Locked              = false;
+            Hash                = new byte[0];
+            Salt                = new byte[0];
+            UserRoles           = new List<UserRole>();
         }
 
         [Key]
@@ -26,17 +29,17 @@ namespace WolfeReiter.Identity.Data.Models
 
         [Required]
         [MaxLength(50)]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [MaxLength(50)]
-        public string GivenName { get; set; }
+        public string? GivenName { get; set; }
 
         [MaxLength(50)]
-        public string Surname { get; set; }
+        public string? Surname { get; set; }
 
         [Required]
         [MaxLength(100)]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         [Required]
         [MaxLength(256 / 8)]

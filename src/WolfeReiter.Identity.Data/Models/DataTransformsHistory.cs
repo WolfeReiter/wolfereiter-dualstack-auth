@@ -15,7 +15,7 @@ namespace WolfeReiter.Identity.Data.Models
         [MaxLength(150)]
         [Required]
         [Key]
-        public string TransformId { get; set; }
+        public string? TransformId { get; set; }
 
         [Required]
         public DateTime Applied { get; set; }

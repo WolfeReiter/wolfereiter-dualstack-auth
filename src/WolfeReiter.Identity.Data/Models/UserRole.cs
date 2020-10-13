@@ -9,6 +9,8 @@ namespace WolfeReiter.Identity.Data.Models
         public UserRole()
         {
             UserRoleId = Guid.NewGuid();
+            Role = new Role();
+            User = new User();
         }
 
         [Key]
