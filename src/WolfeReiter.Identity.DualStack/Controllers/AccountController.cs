@@ -38,14 +38,20 @@ namespace WolfeReiter.Identity.DualStack.Controllers
         string ValidSelfEnrollmentEmailPattern => Configuration.GetValue<string>("Account:ValidSelfEnrollmentEmailPattern");
 
         public AccountController(IConfiguration configuration, ILogger<AccountController> logger, IDistributedCache cache, 
-            CryptoService crypto, SmtpClientService smtpClient, SharedDbContext dbContext)
+            CryptoService crypto, SmtpClientService smtpClient, PgSqlContext pgContext, SqlServerContext sqlContext)
         {
             Configuration = configuration;
             _logger       = logger;
             Cache         = cache;
-            DbContext     = dbContext;
             Crypto        = crypto;
             SmtpClient    = smtpClient;
+
+            DbContext = (configuration.GetValue<string>("EntityFramework:Driver")) switch
+            {
+                "PostgreSql" => pgContext,
+                "SqlServer" => sqlContext,
+                _ => throw new InvalidOperationException("The EntityFramework:Driver configuration value must be set to \"PostgreSql\" or \"SqlServer\"."),
+            };
         }
 
         [HttpGet]
@@ -117,7 +123,6 @@ namespace WolfeReiter.Identity.DualStack.Controllers
 
             await DbContext.SaveChangesAsync();
             return RedirectFromLogin(model.RedirectUrl);
-
         }
 
         async Task SignInAsync(Data.Models.User user)
@@ -133,12 +138,13 @@ namespace WolfeReiter.Identity.DualStack.Controllers
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.AuthenticationMethod, "username/password database"),
+                new Claim(ClaimTypes.AuthenticationMethod, "database"),
                 new Claim(ClaimTypes.Name, user.Name!),
                 new Claim(ClaimTypes.Email, user.Email!),
                 new Claim(ClaimTypes.GivenName, user.GivenName ?? string.Empty),
                 new Claim(ClaimTypes.Surname, user.Surname ?? string.Empty),
-                new Claim("UserId", user.UserId.ToString("N"))
+                new Claim("UserId", user.UserId.ToString("N")),
+                new Claim("UserNumber", user.UserNumber.ToString())
             };
             claims.AddRange(roles.Select(x => new Claim(ClaimTypes.Role, x.Name!)));
 
