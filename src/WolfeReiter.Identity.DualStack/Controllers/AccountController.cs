@@ -348,7 +348,7 @@ namespace WolfeReiter.Identity.DualStack.Controllers
             //test if requested username exists
             if (DbContext.Users.Where(x => x.Name == model.Username).Any())
             {
-                ModelState.AddModelError("", $"\"{model.Username}\" is already in use.");
+                ModelState.AddModelError("Username", $"\"{model.Username}\" is already in use.");
                 ModelState.AddModelError("", $"\"{model.Username}\" is already in use. Please select something else. Your username does not have to match your email address.");
                 return View(model);
             }
