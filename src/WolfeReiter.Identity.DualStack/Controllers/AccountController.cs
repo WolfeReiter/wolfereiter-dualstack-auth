@@ -14,6 +14,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web;
+using MimeKit;
 using WolfeReiter.Identity.Data;
 using WolfeReiter.Identity.DualStack.Models;
 using WolfeReiter.Identity.DualStack.Security;
@@ -24,7 +25,7 @@ namespace WolfeReiter.Identity.DualStack.Controllers
     public class AccountController : Controller
     {
         private readonly IConfiguration Configuration;
-        private readonly ILogger<AccountController> _logger;
+        private readonly ILogger<AccountController> Logger;
         private readonly IDistributedCache Cache;
         private readonly CryptoService Crypto;
         private readonly SmtpClientService SmtpClient;
@@ -41,7 +42,7 @@ namespace WolfeReiter.Identity.DualStack.Controllers
             CryptoService crypto, SmtpClientService smtpClient, PgSqlContext pgContext, SqlServerContext sqlContext)
         {
             Configuration = configuration;
-            _logger       = logger;
+            Logger        = logger;
             Cache         = cache;
             Crypto        = crypto;
             SmtpClient    = smtpClient;
@@ -125,33 +126,112 @@ namespace WolfeReiter.Identity.DualStack.Controllers
             return RedirectFromLogin(model.RedirectUrl);
         }
 
-        async Task SignInAsync(Data.Models.User user)
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult Forgot()
         {
-            var roles = await DbContext.UserRoles
-                .Where(x => x.UserId == user.UserId)
-                .Join(DbContext.Roles, ur => ur.RoleId, r => r.RoleId, (ur, r) => new
-                {
-                    r.RoleId,
-                    r.Name
-                })
-                .ToListAsync();
+            return View(new ForgotViewModel());
+        }
 
-            var claims = new List<Claim>
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Forgot(ForgotViewModel model)
+        {
+            //validate username exists
+            //validate user is active
+            //encode reset token
+            //mail reset token
+
+            var user = await DbContext.Users.Where(x => x.Name == model.Username).FirstOrDefaultAsync();
+            if (user == null)
             {
-                new Claim(ClaimTypes.AuthenticationMethod, "database"),
-                new Claim(ClaimTypes.Name, user.Name!),
-                new Claim(ClaimTypes.Email, user.Email!),
-                new Claim(ClaimTypes.GivenName, user.GivenName ?? string.Empty),
-                new Claim(ClaimTypes.Surname, user.Surname ?? string.Empty),
-                new Claim("UserId", user.UserId.ToString("N")),
-                new Claim("UserNumber", user.UserNumber.ToString())
-            };
-            claims.AddRange(roles.Select(x => new Claim(ClaimTypes.Role, x.Name!)));
+                ModelState.AddModelError("", "Please register before attempting to log in.");
+                ModelState.AddModelError("Username", $"\"{model.Username}\" is not registered.");
+                return View(model);
+            }
 
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                new ClaimsPrincipal(identity));
+            if (!user.Active)
+            {
+                ModelState.AddModelError("", $"\"{model.Username}\" is disabled. Please contact the administrator.");
+                ModelState.AddModelError("Username", $"\"{ model.Username}\" is disabled.");
+                return View(model);
+            }
+
+            var token = EncodeResetToken(user);
+            var cryptoken = EncryptToken(token);
+
+            var resetLink = Url.ActionLink("Reset", "Account", new { id = cryptoken });
+
+            var message = new MimeMessage();
+            message.From.Add(SmtpClient.SystemFromAddress);
+            message.To.Add(new MailboxAddress((string?)null, user.Email));
+            message.Subject = "Password Reset Requested";
+
+            var builder = new BodyBuilder
+            {
+                //TODO: message tempate as txt and html part resource
+                TextBody = "Follow the link below to reset your password in the TBD system. " +
+                $"This reset link will expire {TokenValidMinutes} minutes after you requested it. " +
+                "If you do not wish to reset your password, you can safely ignore this message.\n\n" +
+                $"<{resetLink}>",
+
+                HtmlBody = "<p>Follow the link below to reset your password in the TBD system.</p>" +
+                $"<p><a href={resetLink}>Follow this link to reset your password. The ink will " +
+                $"expire {TokenValidMinutes} minutes after you requested it.</a></p>" +
+                "<p>If you do not wish to reset your password, you can safely ignore this message.</p>" 
+            };
+
+            message.Body = builder.ToMessageBody();
+
+            try
+            {
+                await SmtpClient.SendMessageAsync(message);
+                ViewBag.Message = $"We have sent you an email from {SmtpClient.SystemFromAddress.Address} that contains a link to reset your email. " +
+                    $"The link will expire in {TokenValidMinutes} minutes.";
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Error sending email.");
+                ModelState.AddModelError("", e.Message);
+            }
+
+            return View(model);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> Reset(string id)
+        {
+            //id is an encrypted token
+            //token not useable, start over
+            if (!(await ValidateResetTokenAsync(id)).success) return View("Forgot", new ForgotViewModel());
+
+            //otherwise the token is OK.
+            //user is allowed to reset password.
+            return View(new ResetViewModel() { Token = id });
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Reset(ResetViewModel model)
+        {
+            //token not useable, start over
+            var result = await ValidateResetTokenAsync(model.Token);
+            if (!result.success) return View("Forgot", new ForgotViewModel());
+            if (!ModelState.IsValid) return View(model);
+
+            var user = result.user!; //result.user cannot be null when result.success == true
+            var salt = PwdUtil.NewSalt();
+            var hash = PwdUtil.Hash(model.Password!, salt); //model.Password cannot be null if ModelState.IsValid == true
+            user.Hash = hash;
+            user.Salt = salt;
+
+            await DbContext.SaveChangesAsync();
+            await SignInAsync(user);
+
+            return RedirectFromLogin();
         }
 
         [HttpGet]
@@ -227,6 +307,177 @@ namespace WolfeReiter.Identity.DualStack.Controllers
             }
 
             return View();
+        }
+
+
+        async Task SignInAsync(Data.Models.User user)
+        {
+            var roles = await DbContext.UserRoles
+                .Where(x => x.UserId == user.UserId)
+                .Join(DbContext.Roles, ur => ur.RoleId, r => r.RoleId, (ur, r) => new
+                {
+                    r.RoleId,
+                    r.Name
+                })
+                .ToListAsync();
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.AuthenticationMethod, "database"),
+                new Claim(ClaimTypes.Name, user.Name!),
+                new Claim(ClaimTypes.Email, user.Email!),
+                new Claim(ClaimTypes.GivenName, user.GivenName ?? string.Empty),
+                new Claim(ClaimTypes.Surname, user.Surname ?? string.Empty),
+                new Claim("UserId", user.UserId.ToString("N")),
+                new Claim("UserNumber", user.UserNumber.ToString())
+            };
+            claims.AddRange(roles.Select(x => new Claim(ClaimTypes.Role, x.Name!)));
+
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(identity));
+        }
+
+        async Task<(bool success, Data.Models.User? user)> ValidateResetTokenAsync(string? encrypted)
+        {
+            //valid token must: 
+            //1. decrypt successfully
+            //2. valid userId
+            //3. truncated hash of User.Hash must match the database version
+            //4. has not expired
+            (bool success, Data.Models.User? user) result = (false, null);
+            
+            if (string.IsNullOrEmpty(encrypted)) 
+            {
+                return result;
+            }
+            else if (!DecryptToken(encrypted, out string? tok) || !TryDecodeResetToken(tok, out (Guid userId, string? hash, DateTime timestamp) token))
+            {
+                //token cannot be read
+                ModelState.AddModelError("", "The token in the password reset link was bad. Please send yourself a new reset email and try again.");
+            }
+            else if (DateTime.UtcNow > token.timestamp.AddMinutes(TokenValidMinutes))
+            {
+                //check token timeout
+                ModelState.AddModelError("", "Your reset link has expired. Please send yourself a new reset email and try again.");
+            }
+            else
+            {
+                //check token vs. user record
+                result.user = await DbContext.Users.Where(x => x.UserId == token.userId).FirstOrDefaultAsync();
+                if (result.user == null)
+                {
+                    ModelState.AddModelError("", $"\"{token.userId} has been deleted. Please contact the system administrator.");
+                }
+                else if (!result.user.Active)
+                {
+                    ModelState.AddModelError("", $"\"{result.user.Name} is disabled. Please contact the system administrator.");
+                }
+                else if (TruncateToBase64(result.user.Hash) != token.hash)
+                {
+                    ModelState.AddModelError("", "Your password has already been reset. Please send yourself a new reset email and try again.");
+                }
+                result.success = true;
+            }
+
+            return result;
+        }
+
+        bool ValidateEnrollmentToken(string encrypted, out string? email)
+        {
+            //valid token must: 
+            //1. decrypt successfully
+            //2. has not expired
+            bool valid = true;
+            email = null;
+
+            if (!DecryptToken(encrypted, out string? tok) || !TryDecodeEnrollmentToken(tok, out (string? email, DateTime timestamp) token))
+            {
+                //token cannot be read
+                ModelState.AddModelError("", "The token in the account enrollment link was bad. Please send yourself another account confirmation email and try again.");
+                valid = false;
+            }
+            else if (DateTime.UtcNow > token.timestamp.AddMinutes(TokenValidMinutes))
+            {
+                //check token timeout
+                ModelState.AddModelError("", "Your account enrollment link has expired. Please send yourself another account confirmation email and try again.");
+                valid = false;
+            }
+            else
+            {
+                email = token.email;
+            }
+
+            return valid;
+        }
+
+        string EncodeResetToken(Data.Models.User user)
+        {
+            //token format: "userId:hash:timestamp"
+            //userId for reliable account identification
+            //truncated password hash string for anti-replay
+            //timestamp UTC for expiration
+            var hash = TruncateToBase64(user.Hash);
+            return $"{user.UserId:N}:{hash}:{DateTime.UtcNow}";
+        }
+
+        string EncodeEnrollmentToken(string email)
+        {
+            //token format: "email:timestamp"
+            //timestamp UTC for expiration
+
+            return $"{email}:{DateTime.UtcNow}";
+        }
+
+        string TruncateToBase64(byte[] hash)
+        {
+            return Convert.ToBase64String(hash).Substring(0, 10);
+        }
+
+        bool TryDecodeResetToken(string? token, out (Guid userId, string? hash, DateTime timestamp) result)
+        {
+            result = (Guid.Empty, null, DateTime.MinValue);
+            if (string.IsNullOrEmpty(token)) return false;
+            var split = token.Split(":", 3);
+            if (split.Length != 3) return false;
+            if (!Guid.TryParse(split[0], out Guid userId)) return false;
+            string hash = split[1];
+            if (!DateTime.TryParse(split[2], out DateTime timestamp)) return false;
+            result = (userId, hash, timestamp);
+            return true;
+        }
+
+        bool TryDecodeEnrollmentToken(string? token, out (string? email, DateTime timestamp) result)
+        {
+            result = (null, DateTime.MinValue);
+            if (string.IsNullOrEmpty(token)) return false;
+            var split = token.Split(":", 2);
+            if (split.Length != 2) return false;
+            if (!DateTime.TryParse(split[1], out DateTime timestamp)) return false;
+            result = (split[0], timestamp);
+            return true;
+        }
+
+        string EncryptToken(string token)
+        {
+            var encrypted = Crypto.Encrypt(token);
+            var escaped = Uri.EscapeDataString(encrypted);
+            return escaped;
+        }
+
+        bool DecryptToken(string escaped, out string? plaintext)
+        {
+            var encrypted = Uri.UnescapeDataString(escaped);
+            try
+            {
+                return Crypto.DecryptAndVerify(encrypted, out plaintext);
+            }
+            catch
+            {
+                plaintext = null;
+                return false;
+            }
         }
 
     }
