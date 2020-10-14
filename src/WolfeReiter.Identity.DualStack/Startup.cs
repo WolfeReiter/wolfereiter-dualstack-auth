@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -52,7 +53,7 @@ namespace WolfeReiter.Identity.DualStack
                 options.Configuration = "host:4445";
             });
             */
-            
+
             // Sign-in users with the Microsoft identity platform
             services.AddMicrosoftIdentityWebAppAuthentication(Configuration)
                 .EnableTokenAcquisitionToCallDownstreamApi(new string[] { "User.Read", "Directory.Read.All" })
@@ -66,16 +67,19 @@ namespace WolfeReiter.Identity.DualStack
                 options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             });
 
-            services.ConfigureApplicationCookie(options => {
+            //Use services.ConfigureAll<T> because IMvcBuilder.AddMicrosoftIdentityUI() sets AccessDeniedPath using ConfigureAll<T>.
+            //services.ConfigureApplicationCookie(options =>
+            services.ConfigureAll<CookieAuthenticationOptions>(options =>
+            {
                 options.LoginPath = "/Account/SignInMethod"; //override default /Account/Login
-                //TODO: Account/Denied
-                //options.AccessDeniedPath = "/Account/Denied"; //override default /MicrosoftIdentity/Account/Denied
+                options.AccessDeniedPath = "/Account/Denied"; //override default /MicrosoftIdentity/Account/AccessDenied
                 options.LogoutPath = "/Account/SignOut";
             });
 
             services.AddHealthChecks();
             services.AddControllersWithViews()
                 .AddMicrosoftIdentityUI();
+
             var mvcBuilder = services.AddRazorPages();
 #if DEBUG
             //Razor runtime compilation only on DEBUG build.

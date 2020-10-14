@@ -379,6 +379,14 @@ namespace WolfeReiter.Identity.DualStack.Controllers
             return RedirectFromLogin(null);
         }
 
+        [HttpGet]
+        [Authorize]
+        public IActionResult Denied(string returnUrl)
+        {
+            ViewBag.ReturnUrl = returnUrl;
+            return View();
+        }
+
         IActionResult RedirectFromLogin(string? returnUrl = null)
         {
             returnUrl ??= "/";
