@@ -80,7 +80,13 @@ namespace WolfeReiter.Identity.DualStack
                 options.LogoutPath = "/Account/SignOut";
             });
 
-            services.AddHealthChecks();
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(Policies.Administration,
+                    policy => policy.RequireRole(Policies.RequiredRoles.AccountAdministration));
+            });
+
+                services.AddHealthChecks();
             services.AddControllersWithViews()
                 .AddMicrosoftIdentityUI();
 
