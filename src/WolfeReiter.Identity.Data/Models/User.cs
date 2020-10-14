@@ -17,6 +17,8 @@ namespace WolfeReiter.Identity.Data.Models
             Hash                = new byte[0];
             Salt                = new byte[0];
             UserRoles           = new List<UserRole>();
+            Name                = "";
+            Email               = "";
         }
 
         [Key]
@@ -29,7 +31,7 @@ namespace WolfeReiter.Identity.Data.Models
 
         [Required]
         [MaxLength(50)]
-        public string? Name { get; set; }
+        public string Name { get; set; }
 
         [MaxLength(50)]
         public string? GivenName { get; set; }
@@ -39,7 +41,7 @@ namespace WolfeReiter.Identity.Data.Models
 
         [Required]
         [MaxLength(100)]
-        public string? Email { get; set; }
+        public string Email { get; set; }
 
         [Required]
         [MaxLength(256 / 8)]
