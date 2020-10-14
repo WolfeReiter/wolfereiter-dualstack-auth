@@ -1,4 +1,3 @@
-@using WolfeReiter.Identity.DualStack.Models
 @model LoginViewModel
 
 @{
@@ -34,7 +33,7 @@
             <div class="form-group">
                 <a asp-action="Forgot" class="btn btn-outline-secondary btn-block">Reset Password</a>
             </div>
-            @if(ViewBag.EnableSelfEnrollment != null && ViewBag.EnableSelfEnrollment)
+            @if(ViewBag.EnableSelfEnrollment != null &&ViewBag.EnableSelfEnrollment)
             {
             <div class="form-group">
                 <a asp-action="Enroll" class="btn btn-outline-secondary btn-block">Register</a>
