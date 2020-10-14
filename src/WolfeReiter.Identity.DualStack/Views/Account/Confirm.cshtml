@@ -1,0 +1,46 @@
+@model ConfirmEnrollViewModel
+
+@{
+    ViewData["Title"] = "Login";
+}
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h1 class="display-6">Create your account</h1>
+        </div>
+    </div>
+    <div class="row justify-content-center">  
+        <div class="col-md-6">
+            <form asp-action="Confirm" asp-controller="Account" asp-antiforgery="true">
+                @if (ViewBag.Message != null) { <div class="alert alert-info">@ViewBag.Message</div> }
+                <div asp-validation-summary="ModelOnly"></div>
+                <div class="form-group">
+                    <label asp-for="Email" class="control-label"></label>
+                    <input asp-for="Email" class="form-control" readonly="readonly" disabled="disabled" />
+                    <span asp-validation-for="Email"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Username" class="control-label"></label>
+                    <input asp-for="Username" class="form-control" />
+                    <span asp-validation-for="Username"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Password" class="control-label"></label>
+                    <input asp-for="Password" class="form-control" />
+                    <span asp-validation-for="Password"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Confirm" class="control-label"></label>
+                    <input asp-for="Confirm" class="form-control" />
+                    <span asp-validation-for="Confirm"></span>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-block">Create account</button>
+                </div>
+                <input asp-for="Token" type="hidden" />
+            </form>
+        </div>
+    </div>
+
+@section Scripts {
+   @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

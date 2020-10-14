@@ -1,0 +1,30 @@
+@model EnrollViewModel
+
+@{
+    ViewData["Title"] = "Login";
+}
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h1 class="display-6">Create your account</h1>
+        </div>
+    </div>
+    <div class="row justify-content-center">  
+        <div class="col-md-6">
+            <form asp-action="Enroll" asp-controller="Account" asp-antiforgery="true">
+                @if (ViewBag.Message != null) { <div class="alert alert-info">@ViewBag.Message</div> }
+                <div asp-validation-summary="ModelOnly"></div>
+                <div class="form-group">
+                    <label asp-for="Email" class="control-label"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email"></span>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-block">Send confirmation email</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+@section Scripts {
+   @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

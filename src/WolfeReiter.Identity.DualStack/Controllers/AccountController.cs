@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -176,8 +177,8 @@ namespace WolfeReiter.Identity.DualStack.Controllers
                 "If you do not wish to reset your password, you can safely ignore this message.\n\n" +
                 $"<{resetLink}>",
 
-                HtmlBody = "<p>Follow the link below to reset your password in the TBD system.</p>" +
-                $"<p><a href={resetLink}>Follow this link to reset your password. The ink will " +
+                HtmlBody = "<p>The link below will allow you to reset your password in the TBD system.</p>" +
+                $"<p><a href={resetLink}>Follow this link to reset your password. It will " +
                 $"expire {TokenValidMinutes} minutes after you requested it.</a></p>" +
                 "<p>If you do not wish to reset your password, you can safely ignore this message.</p>" 
             };
@@ -239,9 +240,8 @@ namespace WolfeReiter.Identity.DualStack.Controllers
         public IActionResult Enroll()
         {
             if (!EnableSelfEnrollment) throw new NotSupportedException("Self-enrollment is disabled.");
-            //TODO: Enroll()
-            throw new NotImplementedException();
-            //return View(new EnrollViewModel());
+
+            return View(new EnrollViewModel());
         }
 
         [HttpPost]
@@ -249,8 +249,134 @@ namespace WolfeReiter.Identity.DualStack.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Enroll(EnrollViewModel model)
         {
-            await Task.FromResult(0);
-            throw new NotImplementedException();
+            if (!EnableSelfEnrollment) throw new NotSupportedException("Self-enrollment is disabled.");
+
+            if (!ModelState.IsValid) return View(model);
+            if (!string.IsNullOrEmpty(ValidSelfEnrollmentEmailPattern) && !Regex.IsMatch(model.Email, ValidSelfEnrollmentEmailPattern))
+            {
+                ModelState.AddModelError("Email", $"Not permitted.");
+                ModelState.AddModelError("", $"\"{model.Email}\" is not permitted to register. You must use a pre-authorized address. Please contact the system administrator.");
+                return View(model);
+            }
+
+            //create token from email, timestamp
+            //encrypt token
+            var token = EncodeEnrollmentToken(model.Email!); //model.Email cannot be null if ModelState.IsValid == true
+            var cryptoken = EncryptToken(token);
+
+            //send mail loop confirmation
+            var enrollmentLink = Url.ActionLink("Confirm", "Account", new { id = cryptoken });
+
+            var message = new MimeMessage();
+            message.From.Add(SmtpClient.SystemFromAddress);
+            message.To.Add(new MailboxAddress((string?)null, model.Email));
+            message.Subject = "Account Enrollment Requested";
+
+            var builder = new BodyBuilder
+            {
+                //TODO: message tempate as txt and html part resource
+                TextBody = "Follow the link below to create your new account in the  TBD system. " +
+                $"This link will expire {TokenValidMinutes} minutes after you requested it. " +
+                "If you do not wish to reset your password, you can safely ignore this message.\n\n" +
+                $"<{enrollmentLink}>",
+
+                HtmlBody = "<p>Follow the link below to  create your new account in the TBD system.</p>" +
+                $"<p><a href={enrollmentLink}>This link will allow you to finish creating your account. It will " +
+                $"expire {TokenValidMinutes} minutes after you requested it.</a></p>" +
+                "<p>If you do not wish to reset your password, you can safely ignore this message.</p>"
+            };
+
+            message.Body = builder.ToMessageBody();
+
+            try
+            {
+                await SmtpClient.SendMessageAsync(message);
+                ViewBag.Message = $"We have sent you an email from {SmtpClient.SystemFromAddress.Address} that contains a link to create your new account. " +
+                    $"The link will expire in {TokenValidMinutes} minutes.";
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Error sending email.");
+                ModelState.AddModelError("", e.Message);
+            }
+
+            return View(model);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult Confirm(string id)
+        {
+            if (!EnableSelfEnrollment) throw new NotSupportedException("Self-enrollment is disabled.");
+
+            //id is an encrypted token
+            //valid token must: 
+            //1. decrypt successfully
+            //2. has not expired
+            //
+            //then allow loading the view with the token in the model
+            //id is an encrypted token
+            //token not useable, start over
+            if (!ValidateEnrollmentToken(id, out string? email)) return View("Enroll", new EnrollViewModel());
+
+            //otherwise the token is OK.
+            //user is allowed to create an account.
+            //default username is email.
+            return View(new ConfirmEnrollViewModel() { Token = id, Email = email, Username = email });
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Confirm(ConfirmEnrollViewModel model)
+        {
+            if (!EnableSelfEnrollment) throw new NotSupportedException("Self-enrollment is disabled.");
+
+            //Model.Token is an encrypted token
+            //valid token must: 
+            //1. decrypt successfully
+            //2. has not expired
+            //
+            //then allow creating a new Data.Models.User entity.
+
+            //token not useable, start over
+            if (string.IsNullOrEmpty(model.Token) || !ValidateEnrollmentToken(model.Token, out string? email)) 
+            { return View("Enroll", new EnrollViewModel()); }
+            
+            if (!ModelState.IsValid) return View(model);
+
+            //test if requested username exists
+            if (DbContext.Users.Where(x => x.Name == model.Username).Any())
+            {
+                ModelState.AddModelError("", $"\"{model.Username}\" is already in use.");
+                ModelState.AddModelError("", $"\"{model.Username}\" is already in use. Please select something else. Your username does not have to match your email address.");
+                return View(model);
+            }
+            //create user and log in
+            var salt = PwdUtil.NewSalt();
+            var hash = PwdUtil.Hash(model.Password!, salt); //model.Password can't be null if ModelState.IsValid == true
+            var user = new Data.Models.User()
+            {
+                Name = model.Username,
+                Email = email,
+                Hash = hash,
+                Salt = salt
+            };
+
+            try
+            {
+                DbContext.Add(user);
+                await DbContext.SaveChangesAsync();
+                await SignInAsync(user);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, $"Failed to create user: {model.Username}.");
+                ModelState.AddModelError("", $"Unable to create user: {model.Username}.");
+                ModelState.AddModelError("", e.Message);
+                return View(model);
+            }
+            return RedirectFromLogin(null);
         }
 
         IActionResult RedirectFromLogin(string? returnUrl = null)
