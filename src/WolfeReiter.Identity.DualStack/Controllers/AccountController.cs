@@ -22,7 +22,7 @@ using WolfeReiter.Identity.DualStack.Security;
 
 namespace WolfeReiter.Identity.DualStack.Controllers
 {
-    [Authorize(/*Policy = Policies.Administration*/)]
+    [Authorize(Policy = Policies.Administration)]
     public class AccountController : Controller
     {
         private readonly IConfiguration Configuration;
@@ -357,8 +357,8 @@ namespace WolfeReiter.Identity.DualStack.Controllers
             var hash = PwdUtil.Hash(model.Password!, salt); //model.Password can't be null if ModelState.IsValid == true
             var user = new Data.Models.User()
             {
-                Name = model.Username,
-                Email = email,
+                Name = model.Username!, //Username can't be null if ModelState.IsValid == true
+                Email = email!, //email cannot be null if ValidateEnrollmentToken returned true
                 Hash = hash,
                 Salt = salt
             };
