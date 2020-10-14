@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
@@ -60,15 +61,18 @@ namespace WolfeReiter.Identity.DualStack
                 .AddDistributedTokenCaches();
             services.AddWolfeReiterAzureGroupsClaimsTransform(Configuration);
 
-            //sign-in with forms and cookies
-            services.AddAuthentication(options =>
+            //override AuthenticationOptions set by AddMicrosoftIdentityWebAppAuthentication() 
+            //to allow sign-in with forms and cookies instead of as a side-effect of calling
+            //services.AddAuthentication(Action<AuthenticationOptions>). 
+            services.ConfigureAll<AuthenticationOptions>(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             });
 
-            //Use services.ConfigureAll<T> because IMvcBuilder.AddMicrosoftIdentityUI() sets AccessDeniedPath using ConfigureAll<T>.
-            //services.ConfigureApplicationCookie(options =>
+            //IMvcBuilder.AddMicrosoftIdentityUI() sets AccessDeniedPath using ConfigureAll<T>.
+            //Calling services.ConfigureApplicationCookie(Action<ConfigrationOptions>) doesn't work correctly because
+            //AddMicrosoftIdentityUI() can't see that AccessDeniedPath was set through that mechanism.
             services.ConfigureAll<CookieAuthenticationOptions>(options =>
             {
                 options.LoginPath = "/Account/SignInMethod"; //override default /Account/Login
