@@ -8,7 +8,7 @@ namespace WolfeReiter.Identity.DualStack.Security
 
         public static class RequiredRoles
         {
-            public static readonly string[] AccountAdministration = new[] { Roles.Administrator };
+            public static readonly string[] Administration = new[] { Roles.Administrator };
         }
         
     }

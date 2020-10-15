@@ -83,7 +83,7 @@ namespace WolfeReiter.Identity.DualStack
             services.AddAuthorization(options =>
             {
                 options.AddPolicy(Policies.Administration,
-                    policy => policy.RequireRole(Policies.RequiredRoles.AccountAdministration));
+                    policy => policy.RequireRole(Policies.RequiredRoles.Administration));
             });
 
                 services.AddHealthChecks();
