@@ -1,5 +1,4 @@
 import "../lib/jquery/jquery.min.js";
-import "../lib/bootstrap/js/bootstrap.bundle.min.js";
 import "../lib/datatables/js/dataTables.min.js";
 
 "use strict";
