@@ -64,7 +64,7 @@
             "enabled": false,
             "renameLocals": false
         },
-        "sourceMap": true
+        "sourceMap": false
     },
     {
         "outputFileName": "wwwroot/lib/jquery/jquery.min.js",
@@ -75,18 +75,18 @@
             "enabled": false,
             "renameLocals": false
         },
-        "sourceMap": true
+        "sourceMap": false
     },
         {
-            "outputFileName": "wwwroot/lib/jquery/jquery.min.js.map",
+            "outputFileName": "wwwroot/lib/jquery/jquery.min.map",
             "inputFiles": [
-                "node_modules/jquery/dist/jquery.min.js.map"
+                "node_modules/jquery/dist/jquery.min.map"
             ],
             "minify": {
                 "enabled": false,
                 "renameLocals": false
             },
-            "sourceMap": true
+            "sourceMap": false
         },
     {
         "outputFileName": "wwwroot/lib/jquery-validation/jquery.validate.min.js",
@@ -97,7 +97,7 @@
             "enabled": false,
             "renameLocals": false
         },
-        "sourceMap": true
+        "sourceMap": false
     },
     {
         "outputFileName": "wwwroot/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js",
@@ -108,6 +108,6 @@
             "enabled": false,
             "renameLocals": false
         },
-        "sourceMap": true
+        "sourceMap": false
     }
 ]
