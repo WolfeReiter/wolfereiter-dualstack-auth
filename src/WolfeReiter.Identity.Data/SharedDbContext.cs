@@ -25,13 +25,15 @@ namespace WolfeReiter.Identity.Data
         {
             modelBuilder.Entity<User>().HasIndex(x => x.Name).IsUnique();
 
+            modelBuilder.Entity<Role>().HasIndex(x => x.Name).IsUnique();
+
             modelBuilder.Entity<UserRole>()
-                .HasOne<User>(x => x.User)
+                .HasOne<User>(x => x.User!)
                 .WithMany(x => x.UserRoles)
                 .HasForeignKey(x => x.UserId);
 
             modelBuilder.Entity<UserRole>()
-                .HasOne<Role>(x => x.Role)
+                .HasOne<Role>(x => x.Role!)
                 .WithMany(x => x.UserRoles)
                 .HasForeignKey(x => x.RoleId);
         }

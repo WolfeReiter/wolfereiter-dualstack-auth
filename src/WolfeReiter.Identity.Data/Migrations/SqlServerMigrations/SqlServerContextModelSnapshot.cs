@@ -52,6 +52,10 @@ namespace WolfeReiter.Identity.Data.Migrations.SqlServerMigrations
                     b.HasKey("RoleId")
                         .HasName("pk_roles");
 
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasName("ix_roles_name");
+
                     b.ToTable("roles");
                 });
 

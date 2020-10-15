@@ -9,8 +9,6 @@ namespace WolfeReiter.Identity.Data.Models
         public UserRole()
         {
             UserRoleId = Guid.NewGuid();
-            Role = new Role();
-            User = new User();
         }
 
         [Key]
@@ -20,11 +18,11 @@ namespace WolfeReiter.Identity.Data.Models
         [Required]
         [ForeignKey("User")]
         public Guid UserId { get; set; }
-        public User User { get; set; }
+        public User? User { get; set; }
 
         [Required]
         [ForeignKey("Role")]
         public Guid RoleId { get; set; }
-        public Role Role { get; set; }
+        public Role? Role { get; set; }
     }
 }
