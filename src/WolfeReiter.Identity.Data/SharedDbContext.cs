@@ -1,4 +1,5 @@
 using System;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using WolfeReiter.Identity.Data.Models;
 
@@ -7,7 +8,7 @@ namespace WolfeReiter.Identity.Data
     /// <summary>
     /// Configuration shared by all providers, pgsql and sqlserver.
     /// </summary>
-    public abstract class SharedDbContext : DbContext
+    public abstract class SharedDbContext : DbContext, IDataProtectionKeyContext
     {
         public SharedDbContext(DbContextOptions options) : base(options)
         {
@@ -15,6 +16,7 @@ namespace WolfeReiter.Identity.Data
             Roles                 = Set<Role>();
             UserRoles             = Set<UserRole>();
             DataTransformsHistory = Set<DataTransformsHistory>();
+            DataProtectionKeys    = Set<DataProtectionKey>();
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -42,5 +44,8 @@ namespace WolfeReiter.Identity.Data
         public DbSet<Role> Roles { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<DataTransformsHistory> DataTransformsHistory { get; set; }
+
+        //implement IDataProtectionKeyContext for IDataProtectionBuilder.PersistKeysToDbContext<TContext>()
+        public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
     }
 }

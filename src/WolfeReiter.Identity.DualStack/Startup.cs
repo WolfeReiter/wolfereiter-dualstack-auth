@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -36,6 +37,13 @@ namespace WolfeReiter.Identity.DualStack
         {
             services.AddDbContext<PgSqlContext>(options => options.UseNpgsql(Configuration.GetConnectionString("PgSqlConnection")));
             services.AddDbContext<SqlServerContext>(options => options.UseSqlServer(Configuration.GetConnectionString("SqlServerConnection")));
+
+            _ = (Configuration.GetValue<string>("EntityFramework:Driver")) switch
+            {
+                "PostgreSql" => services.AddDataProtection().PersistKeysToDbContext<PgSqlContext>(),
+                "SqlServer" => services.AddDataProtection().PersistKeysToDbContext<SqlServerContext>(),
+                _ => throw new InvalidOperationException("The EntityFramework:Driver configuration value must be set to \"PostgreSql\" or \"SqlServer\"."),
+            };
 
             services.Configure<CookiePolicyOptions>(options =>
             {
