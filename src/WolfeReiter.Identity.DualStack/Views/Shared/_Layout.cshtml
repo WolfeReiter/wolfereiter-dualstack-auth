@@ -20,6 +20,20 @@
                     <ul class="navbar-nav text-right">
                         @if (User.Identity.IsAuthenticated)
                         {
+                            //instead of testing roles, test policy
+                            //@if (User.IsInRole(Roles.Administrator))
+                            @if ((await AuthorizationService.AuthorizeAsync(User, Policies.Administration)).Succeeded)
+                            {
+                            <li class="nav-item dropdown text-dark text-right">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Administration
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                    <a class="dropdown-item" asp-controller="Account" asp-action="New">Create New Account</a>
+                                    <a class="dropdown-item" asp-controller="Account" asp-action="List">Manage User Accounts</a>
+                                </div>
+                            </li>
+                            }
                         <li class="nav-item dropdown text-right">
                             <a class="nav-link text-dark dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 @User.Identity.Name
