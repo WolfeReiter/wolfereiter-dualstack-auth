@@ -11,6 +11,7 @@ namespace WolfeReiter.Identity.Data.Models
         {
             RoleId = Guid.NewGuid();
             UserRoles = new List<UserRole>();
+            Name = "";
         }
         
         [Key]
@@ -19,7 +20,7 @@ namespace WolfeReiter.Identity.Data.Models
 
         [Required]
         [MaxLength(250)]
-        public string? Name { get; set; }
+        public string Name { get; set; }
 
         public IList<UserRole> UserRoles { get; set; }
     }
