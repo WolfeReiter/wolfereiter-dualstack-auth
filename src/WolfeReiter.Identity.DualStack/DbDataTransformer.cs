@@ -30,7 +30,10 @@ namespace WolfeReiter.Identity.DualStack
 
             rowsAffected += await AddRoles();
             rowsAffected += await AddSysadminUser();
-
+            if (Env.IsDevelopment())
+            {
+                rowsAffected += await AddFakeAccounts("fake", 50);
+            }
             return rowsAffected;
         }
 
@@ -90,6 +93,35 @@ namespace WolfeReiter.Identity.DualStack
                 rowsAffected += await DbContext.SaveChangesAsync();
             }
 
+            return rowsAffected;
+        }
+
+        async Task<int> AddFakeAccounts(string pattern, int number)
+        {
+            const string transformId = "AddFakeAccounts";
+            int rowsAffected = 0;
+
+            if (!DbContext.DataTransformsHistory.Where(x => x.TransformId == transformId).Any())
+            {
+
+                var fakeDomain = Configuration.GetValue<string>("Setup:FakeUserDomain");
+                var fakePrefix = Configuration.GetValue<string>("Setup:FakeUserPrefix");
+                
+                DbContext.DataTransformsHistory.Add(new DataTransformsHistory { TransformId = transformId });
+
+                for (int i = 0; i < number; i++)
+                {
+                    DbContext.Users.Add(new User()
+                    {
+                        Name = $"{pattern}-{i}",
+                        Email = $"{fakePrefix}+{pattern}-{i}@{fakeDomain}",
+                        //unusable password
+                        Hash = new byte[0],
+                        Salt = new byte[0]
+                    });
+                }
+                rowsAffected += await DbContext.SaveChangesAsync();
+            }
             return rowsAffected;
         }
     }
