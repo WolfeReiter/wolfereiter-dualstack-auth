@@ -1,0 +1,14 @@
+{
+    "version": "1.0.0",
+    "name": "asp.net",
+    "private": true,
+    "devDependencies": {},
+    "dependencies": {
+        "@types/bootstrap": "^5.0.0",
+        "@types/jquery": "^3.5.3",
+        "bootstrap": "^4.5.3",
+        "datatables.net-bs4": "^1.10.22",
+        "jquery": "^3.5.1",
+        "jquery-validation-unobtrusive": "^3.2.11"
+    }
+}

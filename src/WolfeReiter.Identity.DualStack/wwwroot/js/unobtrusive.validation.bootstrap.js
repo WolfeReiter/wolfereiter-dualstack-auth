@@ -1,4 +1,7 @@
-(function ($) {
+import "../lib/jquery/jquery.min.js";
+
+"use strict"
+(function () {
     if ($.validator && $.validator.unobtrusive) {
         var defaultOptions = {
             validClass: 'is-valid',
@@ -35,4 +38,4 @@
     else {
         console.warn('$.validator is not defined. Please load this library **after** loading jquery.validate.js and jquery.validate.unobtrusive.js');
     }
-})(jQuery);
+})();
