@@ -6,6 +6,7 @@ if [ ! -f "`which npm`" ]; then
     echo "sudo port install npm6"
     exit 1
 fi
+
 echo "Updating npm packages..."
 cd src/WolfeReiter.Identity.DualStack/
 npm update

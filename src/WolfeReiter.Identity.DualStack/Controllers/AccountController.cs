@@ -30,7 +30,6 @@ namespace WolfeReiter.Identity.DualStack.Controllers
         private readonly IDistributedCache Cache;
         private readonly CryptoService Crypto;
         private readonly SmtpClientService SmtpClient;
-
         private readonly SharedDbContext DbContext;
 
         int AccountLockoutSeconds => Configuration.GetValue<int>("Account:LockoutSeconds", 300);
@@ -443,6 +442,11 @@ namespace WolfeReiter.Identity.DualStack.Controllers
             return View();
         }
 
+        [HttpGet]
+        public IActionResult List()
+        {
+            return View();
+        }
 
         async Task SignInAsync(Data.Models.User user)
         {
