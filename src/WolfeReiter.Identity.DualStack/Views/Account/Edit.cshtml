@@ -1,0 +1,90 @@
+@model EditUserViewModel
+
+@{
+    ViewData["Title"] = "Login";
+}
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h1 class="display-6">Edit user: @Model.Username</h1>
+        </div>
+    </div>
+    <div class="row justify-content-center">  
+        <div class="col-md-6">
+            <form asp-action="Edit" asp-controller="Account" asp-antiforgery="true">
+                @if (ViewBag.Message != null) { <div class="alert alert-info">@ViewBag.Message</div> }
+                <div asp-validation-summary="ModelOnly"></div>
+                <div class="form-group">
+                    <label asp-for="UserNumber" class="control-label"></label>
+                    <input asp-for="UserNumber" class="form-control" readonly="readonly" disabled="disabled" />
+                    <span asp-validation-for="UserNumber"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Username" class="control-label"></label>
+                    <input asp-for="Username" class="form-control" />
+                    <span asp-validation-for="Username"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Password" class="control-label"></label>
+                    <input asp-for="Password" class="form-control" />
+                    <span asp-validation-for="Password"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Confirm" class="control-label"></label>
+                    <input asp-for="Confirm" class="form-control" />
+                    <span asp-validation-for="Confirm"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Email" class="control-label"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email"></span>
+                </div>                
+                <div class="form-group">
+                    <label asp-for="GivenName" class="control-label"></label>
+                    <input asp-for="GivenName" class="form-control" />
+                    <span asp-validation-for="GivenName"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Surname" class="control-label"></label>
+                    <input asp-for="Surname" class="form-control" />
+                    <span asp-validation-for="Surname"></span>
+                </div>
+                <hr />
+                <div class="form-group">
+                    <label asp-for="Active" class="control-label"></label>
+                    <input asp-for="Active" class="form-control" />
+                    <span asp-validation-for="Active"></span>
+                </div>
+                @if (Model.Locked) {
+                <hr />
+                <div class="form-group">
+                    <label asp-for="Locked" class="control-label"></label>
+                    <input asp-for="Locked" class="form-control" />
+                    <span asp-validation-for="Locked"></span>
+                </div>
+                }
+                <hr />
+                <div class="form-group">
+                    @for (int i = 0; i < Model.Roles.Count; i++) {
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" asp-for="@Model.Roles[i].Checked"  />
+                        <label class="form-check-label" asp-for="@Model.Roles[i].Checked">@Model.Roles[i].Text</label>
+                        <input type="hidden" asp-for="@Model.Roles[i].Id" />
+                        <input type="hidden" asp-for="@Model.Roles[i].Text" />
+                    </div>
+                    }
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-block">Update account</button>
+                </div>
+                <hr />
+                <div class="form-group">
+                    <a href="javascript:window.close();" class="btn btn-outline-secondary btn-block">Cancel</a>
+                </div>
+                <input type="hidden" asp-for="UserId" />
+            </form>
+        </div>
+    </div>
+
+@section Scripts {
+   @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

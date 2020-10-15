@@ -448,6 +448,140 @@ namespace WolfeReiter.Identity.DualStack.Controllers
             return View();
         }
 
+        [HttpGet]
+        public async Task<IActionResult> New()
+        {
+            var roles = await DbContext.Roles
+                .Select(x => new CheckboxItem<Guid>() { Id = x.RoleId, Text = x.Name })
+                .OrderBy(x => x.Text)
+                .ToListAsync();
+
+            return View(new NewUserViewModel() { Roles = roles });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> New(NewUserViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var salt = PwdUtil.NewSalt();
+            var hash = PwdUtil.Hash(model.Password!, salt); //Password can't be null of ModelState.IsValid.
+
+            var user = new Data.Models.User()
+            {
+                Name      = model.Username!, //Username can't be null if ModelState.IsValid == true.
+                Email     = model.Email!,    //Email can't be null if ModelState.IsValid == true.
+                GivenName = string.IsNullOrEmpty(model.GivenName) ? null : model.GivenName,
+                Surname   = string.IsNullOrEmpty(model.Surname) ? null : model.Surname,
+                Hash      = hash,
+                Salt      = salt
+            };
+
+            var roles = model.Roles
+                .Where(x => x.Checked)
+                .Select(x => new Data.Models.UserRole() { RoleId = x.Id, UserId = user.UserId });
+
+            try
+            {
+                DbContext.Add(user);
+                foreach (var role in roles)
+                {
+                    DbContext.Add(role);
+                }
+                await DbContext.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Exception inserting new Data.Models.User.");
+                ModelState.AddModelError("", e.Message);
+                return View(model);
+            }
+
+            return RedirectToAction("Edit", new { id = user.UserId, created = true });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(Guid id, bool? created)
+        {
+            var user = await DbContext.Users.Where(x => x.UserId == id).SingleOrDefaultAsync();
+            if (user == null) throw new ArgumentException($"The 'id' ({id}) does not match an existing User.");
+            if (created ?? false) ViewBag.Message = "Account successfully created. You may make edits or close this tab.";
+
+            var roles = await DbContext.Roles
+                .GroupJoin(DbContext.UserRoles.Where(x => x.UserId == id), r => r.RoleId, ur => ur.RoleId, (r, ur) => new { UserRoles = ur, Roles = r })
+                .SelectMany(x => x.UserRoles.DefaultIfEmpty(), (x, ur) => new { x.Roles.RoleId, x.Roles.Name, ur })
+                .Select(x => new CheckboxItem<Guid>() { Id = x.RoleId, Text = x.Name, Checked = (x.ur != null) })
+                .OrderBy(x => x.Text)
+                .ToListAsync();
+
+            var model = new EditUserViewModel()
+            {
+                UserId     = user.UserId,
+                UserNumber = user.UserNumber,
+                Username   = user.Name,
+                Email      = user.Email,
+                GivenName  = user.GivenName,
+                Surname    = user.Surname,
+                Active     = user.Active,
+                Locked     = user.Locked,
+                Roles      = roles
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(EditUserViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var user = await DbContext.Users.Where(x => x.UserId == model.UserId).SingleOrDefaultAsync();
+            if (user == null) throw new ArgumentException($"The 'UserId' ({model.UserId}) does not match an existing User.");
+
+
+            user.Name      = model.Username!; //Username can't be null if ModelState.IsValid == true
+            user.Email     = model.Email!;    //Email can't be null of ModelState.IsValid == true
+            user.Active    = model.Active;
+            user.GivenName = string.IsNullOrEmpty(model.GivenName) ? null : model.GivenName;
+            user.Surname   = string.IsNullOrEmpty(model.Surname) ? null : model.Surname;
+
+            if (!string.IsNullOrEmpty(model.Password))
+            {
+                var salt  = PwdUtil.NewSalt();
+                var hash  = PwdUtil.Hash(model.Password, salt);
+                user.Salt = salt;
+                user.Hash = hash;
+            }
+
+            //force unlock from failed login attempts by resetting failed count and setting the lock bit
+            if (!model.Locked && user.Locked)
+            {
+                user.Locked = false;
+                user.FailedLoginAttempts = 0;
+            }
+
+            var currentRoles = await DbContext.UserRoles.Where(x => x.UserId == model.UserId).ToListAsync();
+            var selected     = model.Roles.Where(x => x.Checked).Select(x => x.Id);
+            var unselected   = model.Roles.Where(x => x.Checked).Select(x => x.Id);
+            var added        = selected.Where(x => !currentRoles.Select(x => x.RoleId).Contains(x)).Select(x => new Data.Models.UserRole() { RoleId = x, UserId = model.UserId });
+            DbContext.RemoveRange(currentRoles.Where(x => unselected.Contains(x.RoleId)));
+            await DbContext.AddRangeAsync(added);
+
+            try
+            {
+                await DbContext.SaveChangesAsync();
+                ViewBag.Message = "Changes saved. You may make edits or close this tab.";
+            }
+            catch (Exception e)
+            {
+                ModelState.AddModelError("", e.Message);
+                Logger.LogError(e, "Error saving user edit.");
+            }
+
+            return View(model);
+        }
+
         async Task SignInAsync(Data.Models.User user)
         {
             var roles = await DbContext.UserRoles
