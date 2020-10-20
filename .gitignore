@@ -5,6 +5,8 @@
 
 # contains secrets in environment variables.
 docker-compose.yml
+docker-compose-pgsql.yml
+docker-compose-mssql.yml
 
 # User-specific files
 *.suo
