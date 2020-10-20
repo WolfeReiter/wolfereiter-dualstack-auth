@@ -36,6 +36,10 @@ printf_color "Updating SQL Server 2019 container...\n"
 docker pull mcr.microsoft.com/mssql/server:2019-latest
 printf_color "Done.\n\n"
 
+printf_color "Updating redis container...\n"
+docker pull redis:6
+printf_color "Done.\n\n"
+
 printf_color "Updating dotnet core 3.1 containers...\n"
 #docker pull mcr.microsoft.com/dotnet/core/sdk:3.1
 #docker pull mcr.microsoft.com/dotnet/core/aspnet:3.1

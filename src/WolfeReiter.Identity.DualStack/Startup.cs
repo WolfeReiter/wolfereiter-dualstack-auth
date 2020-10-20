@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -42,7 +43,7 @@ namespace WolfeReiter.Identity.DualStack
             {
                 "PostgreSql" => services.AddDataProtection().PersistKeysToDbContext<PgSqlContext>(),
                 "SqlServer" => services.AddDataProtection().PersistKeysToDbContext<SqlServerContext>(),
-                _ => throw new InvalidOperationException("The EntityFramework:Driver configuration value must be set to \"PostgreSql\" or \"SqlServer\"."),
+                _ => throw new InvalidOperationException("The EntityFramework:Driver configuration value must be set to \"PostgreSql\" or \"SqlServer\".")
             };
 
             services.Configure<CookiePolicyOptions>(options =>
@@ -54,14 +55,25 @@ namespace WolfeReiter.Identity.DualStack
                 options.HandleSameSiteCookieCompatibility();
             });
 
-            //in production use DistributedSqlServerCache or Redis Cache
-            services.AddDistributedMemoryCache();
-            /*
-            services.AddStackExchangeRedisCache(options =>
+            _ = (Configuration.GetValue<string>("DistributedCache:Driver")) switch
             {
-                options.Configuration = "host:4445";
-            });
-            */
+                //don't use DistributedMemoryCache in production with multiple web workers, 
+                //it is just a cache in the local process memory
+                "Memory"    => services.AddDistributedMemoryCache(),
+                "Redis"     => services.AddStackExchangeRedisCache(options => 
+                            { 
+                                options.Configuration = Configuration.GetConnectionString("Redis"); 
+                            }),
+                //create the schema with the dotnet-sql-cache global tool:
+                //dotnet sql-cache create "connectionstring" dbo Cache
+                "SqlServer" => services.AddDistributedSqlServerCache(options =>
+                            {
+                                options.ConnectionString = Configuration.GetConnectionString("SqlServerConnection");
+                                options.SchemaName = "dbo";
+                                options.TableName = "Cache";
+                            }),
+                _ => throw new InvalidOperationException("The DistributedCache:Driver configuration value must be set to \"Memory\", \"Redis\"or \"SqlServer\"."),
+            };
 
             // Sign-in users with the Microsoft identity platform
             services.AddMicrosoftIdentityWebAppAuthentication(Configuration)
