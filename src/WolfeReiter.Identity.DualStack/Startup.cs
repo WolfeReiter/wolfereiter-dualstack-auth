@@ -62,7 +62,7 @@ namespace WolfeReiter.Identity.DualStack
                 "Memory"    => services.AddDistributedMemoryCache(),
                 "Redis"     => services.AddStackExchangeRedisCache(options => 
                             { 
-                                options.Configuration = Configuration.GetConnectionString("Redis"); 
+                                options.Configuration = Configuration.GetConnectionString("RedisConnection"); 
                             }),
                 //create the schema with the dotnet-sql-cache global tool:
                 //dotnet sql-cache create "connectionstring" dbo Cache
