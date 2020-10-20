@@ -64,8 +64,6 @@ namespace WolfeReiter.Identity.DualStack
                             { 
                                 options.Configuration = Configuration.GetConnectionString("RedisConnection"); 
                             }),
-                //create the schema with the dotnet-sql-cache global tool:
-                //dotnet sql-cache create "connectionstring" dbo Cache
                 "SqlServer" => services.AddDistributedSqlServerCache(options =>
                             {
                                 options.ConnectionString = Configuration.GetConnectionString("SqlServerConnection");

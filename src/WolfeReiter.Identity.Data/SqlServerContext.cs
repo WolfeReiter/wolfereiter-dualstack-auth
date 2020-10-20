@@ -2,6 +2,7 @@ using System;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using WolfeReiter.Identity.Data.Models;
+using WolfeReiter.Identity.Data.Models.SqlServer;
 
 namespace WolfeReiter.Identity.Data
 {
@@ -12,11 +13,18 @@ namespace WolfeReiter.Identity.Data
     {
         public SqlServerContext(DbContextOptions<SqlServerContext> options) : base(options)
         {
+            Cache = Set<Cache>();
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
         }
+
+        public DbSet<Cache> Cache { get; set; }
     }
 }

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WolfeReiter.Identity.Data;
 
 namespace WolfeReiter.Identity.Data.Migrations.SqlServerMigrations
 {
     [DbContext(typeof(SqlServerContext))]
-    partial class SqlServerContextModelSnapshot : ModelSnapshot
+    [Migration("20201020141807_UndoSnakeCasing")]
+    partial class UndoSnakeCasing
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -68,29 +70,6 @@ namespace WolfeReiter.Identity.Data.Migrations.SqlServerMigrations
                         .IsUnique();
 
                     b.ToTable("Roles");
-                });
-
-            modelBuilder.Entity("WolfeReiter.Identity.Data.Models.SqlServer.Cache", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTimeOffset?>("AbsoluteExpiration")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset>("ExpiresAtTime")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<long?>("SlidingExpirationInSeconds")
-                        .HasColumnType("bigint");
-
-                    b.Property<byte[]>("Value")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Cache");
                 });
 
             modelBuilder.Entity("WolfeReiter.Identity.Data.Models.User", b =>

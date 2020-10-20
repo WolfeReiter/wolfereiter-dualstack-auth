@@ -18,10 +18,6 @@ namespace WolfeReiter.Identity.Data
             DataTransformsHistory = Set<DataTransformsHistory>();
             DataProtectionKeys    = Set<DataProtectionKey>();
         }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSnakeCaseNamingConvention();
-        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
