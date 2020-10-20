@@ -1,0 +1,47 @@
+# fill in empty strings and rename file to docker-compose.yml
+version: "3"
+services:
+  wr-id-dual:
+    build: .
+    image: wr-id-dual:latest
+    ports:
+      - "5000:80"
+    depends_on:
+      - pgsql
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+      DOTNET_PRINT_TELEMETRY_MESSAGE: "false"
+      EntityFramework__Driver: "PostgreSql"
+      DistributedCache__Driver: "Redis"
+      ConnectionStrings__PgSqlConnection: 
+        "Host=pgsql;Database=wr_dualstack;Username=wr_dualstack;Password=Ktu2BCDuE3pgq9LwOm6fHDfDxGfOnOwyqy1O49JilmhbhrFqd2"
+      ConnectionStrings__Redis: "redis:6379"
+      Cryptography__RsaKeyPair: "PFJTQUtleVZhbHVlPjxNb2R1bHVzPm9TZWRSc1RMd2xldjBnZUkxVnlCMFU2bzRYQktqbUF5RTZUei8yNyt6dDg0YmQrQjI5SkViZWl6dlJNUVNTMU9YOW8rZENhZVFVc2tpWE9LL3p0Y3pTWVZ1TjRmRjBpVmNack1EYjNZUVcyZE9RbVRQNjR1bnJ0TkpGUFdIbVR0aFAzL0pWTGpEcDl4N2V2b042NXBudlRwckFvMUZ5dnZCQzRCSDNIdTFXTXd6RVA5eWJ2cjVKY1lRQjhWbGdleHE4YXZaLzc1QUxHQlBoNCt4Um5FTTh6dS9OUHF4Q0lRazBnaFNlQjRrdzhYdjRheDdoSzhxdFVGS3Y5QTB4RVNaWU9Qb1VFd24rVUlsOWVwWHBWM21sc1ZodFdscW9FMlBoYlRvbHBrUVllUHpOaXdGNjNoUk1XdEVtTmNpVGlMRXU1Tkx4eldPK3dmYWlEQWJad0lVdz09PC9Nb2R1bHVzPjxFeHBvbmVudD5BUUFCPC9FeHBvbmVudD48UD4xRUwwTHR4WUtkYndUU2JjbWswZThHVlozQzFpNzJ3SmhYM2o1RWdpS2Y5dHJnejVIUjBwU3FIMWtscHVkbG9JdUhaZVUzVkdsNDRUMHlEY3B4T2RVb0tRYU9UM1FvbUdXREY0SGlYRnBDaVJTUnBDZmFVenpGZjc2R0lCY0RZRzRsT2Exdlh6dkJRZDFSOEVybC8wZGgrTGV3aFFkb05wMlVYelNDdkFHclU9PC9QPjxRPndseTNocVd2UEFNZngwNXVWdWVpdm5mYloyZWhIUXBlVUhYVXFuelpUWHo3b1JzLzIzTjJOR3U3M3A1VmxlRWdQaVV6aXFSby9IMlRLZjBPaUVqMnU1OWpjNEQ3ZVY2dnlsSk5vQjk2c3JVZU1HTzZJQTVvWTBDL0Z1RXJ2OHgxcGtNSWlxNXRycFNnL1NQT2svaWozNHBnZSsreHk5TVBVblZETWxMMmsrYz08L1E+PERQPnRaSVVpU1Zwc1Zpd3RINml4TWRseU9RWnl6Tno1elMyckY5MUd5anRPSm5NTzgvVEpTbDEwZWJiUjNkZCtKV3AwZ2xIUlFNVUFMN0RqSjRXd2tFUUdhMmdWR3BRYkxWeG0yMnR2N1ExN2VmWjUvdXpsd0ZEWHZDQWgxZVd2V01wM2w4QUhCUEdqRU4xQllNRUlSbnA1MFd5cmVyOTBYTTJqMnE3NGlleXErVT08L0RQPjxEUT5kWVl5d3d3MFpZbE9FZW51OWtXaU5xR3EzVi9nSC90QkJFMzdoZ3R3S2xiRW9Lb2xkc0RlWE53NEFXaWtQN2lkRW5iVUw2VXlobG80UGs5eUZoNW9jeEx4dzhuZVJZbG5xbU1SNVJ5anlLT1QyWmF6Mk9aZFlJYXFCVitxWUpOMUlFK3dQb3N5YnpvWURuazBWRzBvU2VjV2FGcUxtNy9IcUFpWDFUb3ROMGs9PC9EUT48SW52ZXJzZVE+SXNIZW1BK0psbVJvbjMxMSt2YUlyb2RwdDFEdG1kbllzeUxOd1NINHNwWmhoZ21sQkZpMDlUOURjYlJ6dG9CRG1wVW5nRDEyOGJvWlFidVNNVGV5cmpzS0ZXblBqcTJRc2hRMGhpZnREeWFyM0RNS2hzTEdEKzltNit4TThFSUtYakhUSnd5Uk53S0h5LzBLTkdLZ2VaTjhqajVuMWxmQ2treGZsMk1OWW5NPTwvSW52ZXJzZVE+PEQ+ZzNIN1g3QysvZXBsMTJzYjJlUFZZekxFbnZUbmF3L2RhSmFBQ2xXdmNtOHg2TFNJaUJNT2k1TmxuNC9BRmQvbGNGdGoyM3R3VTVPRjNyTW1xWjN5eU1ZS3E3cEpJOFdwVjN0S2V0N2hXQ1NmTzltcWlDTjdsUzd5OGZHTDBVakRUMW1aVmdrd2VFbm5OSWZaNWlqVnI3aldLK1E3ZjRYdk03cU9ZZWFkUnVDUVQxVjZoem9ncHMrUGNVM3R5b1cvWGx2UTFjcWpTdnhod1pJRnAyTVBjZm5KY1RGYzRsVGFlMXI0djMvdWd4ZUs2bmdVbThTeGFueXlSbkNhK2Nsb3crNmU0MzNQeDg3WmpYODhBbktqL0NBQmFsb1RtL2NjbjUyeU1GdC9wUGhLenBWV1FzY1lhNVZQdmtNc2lZTHpiWTVoWWhyRWpUOWdzY2dXZUpBTHlRPT08L0Q+PC9SU0FLZXlWYWx1ZT4="      
+      Cryptography__AesKey: "V+2UxxL2KsCSFdeaC8YIV+Bjk5pTeacZvW1khm1+EDY="
+      Mail__System__FromName: "Mail Test (do not reply)"
+      Mail__System__FromAddress: ""
+      Mail__Smtp__Host: "host.docker.internal"
+      Mail__Smtp__Port: "25"
+      Mail__Smtp__Authenticate: "false"
+      Setup__SysadminEmail: ""
+      AzureAD__Instance: "https://login.microsoftonline.com/"
+      AzureAD__Domain: ""
+      AzureAD__TenantId:  ""
+      AzureAD__ClientID: ""
+      AzureAD__CallbackPath: "/signin-oidc"
+      AzureAD__SignedOutCallbackPath: "/signout-callback-oidc"
+      AzureAD__ClientSecret: ""
+  pgsql:
+    image: postgres:10
+    volumes: 
+      - dualstack-pgsql-db-vol:/var/lib/postgresql/data
+    environment: 
+      POSTGRES_USER: "wr_dualstack"
+      POSTGRES_PASSWORD: "Ktu2BCDuE3pgq9LwOm6fHDfDxGfOnOwyqy1O49JilmhbhrFqd2"
+      POSTGRES_DB: "wr_dualstack"
+
+  redis:
+    image: redis:6
+
+volumes:
+  dualstack-pgsql-db-vol:
