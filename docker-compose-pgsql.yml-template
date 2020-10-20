@@ -31,6 +31,9 @@ services:
       AzureAD__CallbackPath: "/signin-oidc"
       AzureAD__SignedOutCallbackPath: "/signout-callback-oidc"
       AzureAD__ClientSecret: ""
+      Logging__LogLevel__Default: "Error"
+      Logging__LogLevel__Microsoft: "Error"
+      Logging__LogLevel__Microsoft.Hosting.Lifetime: "Information"
   pgsql:
     image: postgres:10
     volumes: 
