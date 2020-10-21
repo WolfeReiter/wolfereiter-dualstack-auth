@@ -4,14 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
-
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -42,7 +39,7 @@ namespace WolfeReiter.Identity.DualStack
             _ = (Configuration.GetValue<string>("EntityFramework:Driver")) switch
             {
                 "PostgreSql" => services.AddDataProtection().PersistKeysToDbContext<PgSqlContext>(),
-                "SqlServer" => services.AddDataProtection().PersistKeysToDbContext<SqlServerContext>(),
+                "SqlServer"  => services.AddDataProtection().PersistKeysToDbContext<SqlServerContext>(),
                 _ => throw new InvalidOperationException("The EntityFramework:Driver configuration value must be set to \"PostgreSql\" or \"SqlServer\".")
             };
 
@@ -104,7 +101,7 @@ namespace WolfeReiter.Identity.DualStack
                     policy => policy.RequireRole(Policies.RequiredRoles.Administration));
             });
 
-                services.AddHealthChecks();
+            services.AddHealthChecks();
             services.AddControllersWithViews()
                 .AddMicrosoftIdentityUI();
 
@@ -154,7 +151,7 @@ namespace WolfeReiter.Identity.DualStack
             using SharedDbContext context = (Configuration.GetValue<string>("EntityFramework:Driver")) switch
             {
                 "PostgreSql" => scope.ServiceProvider.GetService<PgSqlContext>(),
-                "SqlServer" => scope.ServiceProvider.GetService<SqlServerContext>(),
+                "SqlServer"  => scope.ServiceProvider.GetService<SqlServerContext>(),
                 _ => throw new InvalidOperationException("The EntityFramework:Driver configuration value must be set to \"PostgreSql\" or \"SqlServer\"."),
             };
             context.Database.Migrate();
