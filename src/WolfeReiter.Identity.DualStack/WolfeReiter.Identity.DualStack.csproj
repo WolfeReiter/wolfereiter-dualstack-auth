@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\lib\wolfereiter-graph-claimstranform\src\WolfeReiter.Identity.Claims\WolfeReiter.Identity.Claims.csproj" />
+    <ProjectReference Include="..\..\lib\wolfereiter-graph-claimstransform\src\WolfeReiter.Identity.Claims\WolfeReiter.Identity.Claims.csproj" />
     <ProjectReference Include="..\WolfeReiter.Identity.Data\WolfeReiter.Identity.Data.csproj" />
   </ItemGroup>
 </Project>

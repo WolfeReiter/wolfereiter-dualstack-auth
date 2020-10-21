@@ -13,7 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "wolfereiter-graph-claimstra
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{90BCB95A-9665-45A3-BDD6-2EC304AADF94}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WolfeReiter.Identity.Claims", "lib\wolfereiter-graph-claimstranform\src\WolfeReiter.Identity.Claims\WolfeReiter.Identity.Claims.csproj", "{2E59DE14-87B2-46E5-8BA4-216399370655}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WolfeReiter.Identity.Claims", "lib\wolfereiter-graph-claimstransform\src\WolfeReiter.Identity.Claims\WolfeReiter.Identity.Claims.csproj", "{2E59DE14-87B2-46E5-8BA4-216399370655}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WolfeReiter.Identity.Data", "src\WolfeReiter.Identity.Data\WolfeReiter.Identity.Data.csproj", "{29C7E328-E9C3-4605-BB71-5F91044A79D0}"
 EndProject
