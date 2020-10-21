@@ -408,26 +408,16 @@ namespace WolfeReiter.Identity.DualStack.Controllers
         [HttpGet]
         [AllowAnonymous]
         [Route("/Account/SignOut/")]
-        public async Task<IActionResult> SignOut(string? scheme)
+        public async Task<IActionResult> SignOut()
         {
-            if (User != null && User.GetObjectId() != null)
+            var schemes = new [] { CookieAuthenticationDefaults.AuthenticationScheme };
+            var callbackUrl = Url.ActionLink("SignedOut");
+            if (User?.GetObjectId() != null)
             {
                 await Cache.RemoveGroupClaimsAsync(User);
-                scheme ??= OpenIdConnectDefaults.AuthenticationScheme;
-                var callbackUrl = Url.ActionLink("SignedOut");
-                return SignOut(
-                    new AuthenticationProperties
-                    {
-                        RedirectUri = callbackUrl
-                    },
-                    CookieAuthenticationDefaults.AuthenticationScheme,
-                    scheme);
+                schemes = new [] { CookieAuthenticationDefaults.AuthenticationScheme, OpenIdConnectDefaults.AuthenticationScheme };
             }
-            else
-            {
-                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-                return LocalRedirect("~/");
-            }
+            return SignOut(new AuthenticationProperties { RedirectUri = callbackUrl }, schemes);
         }
 
         [HttpGet]
