@@ -36,7 +36,7 @@ namespace WolfeReiter.Identity.DualStack
             services.AddDbContext<PgSqlContext>(options => options.UseNpgsql(Configuration.GetConnectionString("PgSqlConnection")));
             services.AddDbContext<SqlServerContext>(options => options.UseSqlServer(Configuration.GetConnectionString("SqlServerConnection")));
 
-            _ = (Configuration.GetValue<string>("EntityFramework:Driver")) switch
+            _ = Configuration.GetValue<string>("EntityFramework:Driver") switch
             {
                 "PostgreSql" => services.AddDataProtection().PersistKeysToDbContext<PgSqlContext>(),
                 "SqlServer"  => services.AddDataProtection().PersistKeysToDbContext<SqlServerContext>(),
@@ -52,7 +52,7 @@ namespace WolfeReiter.Identity.DualStack
                 options.HandleSameSiteCookieCompatibility();
             });
 
-            _ = (Configuration.GetValue<string>("DistributedCache:Driver")) switch
+            _ = Configuration.GetValue<string>("DistributedCache:Driver") switch
             {
                 //don't use DistributedMemoryCache in production with multiple web workers, 
                 //it is just a cache in the local process memory
@@ -148,13 +148,13 @@ namespace WolfeReiter.Identity.DualStack
             });
 
             using var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
-            using SharedDbContext context = (Configuration.GetValue<string>("EntityFramework:Driver")) switch
+            using SharedDbContext? context = Configuration.GetValue<string>("EntityFramework:Driver") switch
             {
                 "PostgreSql" => scope.ServiceProvider.GetService<PgSqlContext>(),
                 "SqlServer"  => scope.ServiceProvider.GetService<SqlServerContext>(),
                 _ => throw new InvalidOperationException("The EntityFramework:Driver configuration value must be set to \"PostgreSql\" or \"SqlServer\"."),
             };
-            context.Database.Migrate();
+            context!.Database.Migrate();
             var transformer = new DbDataTransformer(Configuration, env, context);
             int rowsAffected = await transformer.ApplyStartupTransformAsync();
             logger.Log(LogLevel.Information, $"DbDataTransformer.ApplyStartupTransformAsync() affected {rowsAffected} rows.");
