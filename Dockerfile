@@ -4,12 +4,12 @@ WORKDIR /app
 
 # sln and project files
 #COPY *.sln ./
-COPY ./lib/wolfereiter-graph-claimstranform/src/WolfeReiter.Identity.Claims/WolfeReiter.Identity.Claims.csproj ./lib/wolfereiter-graph-claimstranform/src/WolfeReiter.Identity.Claims/
+COPY ./lib/wolfereiter-graph-claimstransform/src/WolfeReiter.Identity.Claims/WolfeReiter.Identity.Claims.csproj ./lib/wolfereiter-graph-claimstransform/src/WolfeReiter.Identity.Claims/
 COPY ./src/WolfeReiter.Identity.Data/WolfeReiter.Identity.Data.csproj ./src/WolfeReiter.Identity.Data/
 COPY ./src/WolfeReiter.Identity.DualStack/WolfeReiter.Identity.DualStack.csproj ./src/WolfeReiter.Identity.DualStack/
 
 # resstore packages
-RUN dotnet restore lib/wolfereiter-graph-claimstranform/src/WolfeReiter.Identity.Claims
+RUN dotnet restore lib/wolfereiter-graph-claimstransform/src/WolfeReiter.Identity.Claims
 RUN dotnet restore src/WolfeReiter.Identity.Data
 RUN dotnet restore src/WolfeReiter.Identity.DualStack
 
