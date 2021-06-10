@@ -1,3 +1,3 @@
 #!/bin/sh
 
-docker build -t wr-id-dual:latest .
+docker build --pull -t wr-id-dual:latest .

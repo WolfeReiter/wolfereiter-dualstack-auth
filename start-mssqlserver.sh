@@ -2,7 +2,7 @@
 
 password=YkBkKCta6zNhlp6buYMAf6tmjjSl4WkIj0R8BfrCXA1zjjQ4PM
 
-docker run --rm \
+docker run --pull --rm \
 -e 'ACCEPT_EULA=Y' \
 -e "MSSQL_SA_PASSWORD=${password}" \
 --name dualstack-mssqlserver \

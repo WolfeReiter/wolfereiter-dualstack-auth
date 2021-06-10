@@ -1,6 +1,6 @@
 #!/bin/sh
 
-docker run --rm \
+docker run --pull --rm \
 --name dualstack-redis \
 -p 6379:6379 \
 -d redis:6
