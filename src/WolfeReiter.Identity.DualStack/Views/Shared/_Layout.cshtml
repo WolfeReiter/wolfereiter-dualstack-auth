@@ -25,7 +25,7 @@
                             //@if (User.IsInRole(Roles.Administrator))
                             @if ((await AuthorizationService.AuthorizeAsync(User, Policies.Administration)).Succeeded)
                             {
-                            <li class="nav-item dropdown">
+                            <li class="nav-item dropdown text-right">
                                 <a class="nav-link text-dark dropdown-toggle" href="#" id="navbarAdminMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     Administration
                                 </a>
@@ -35,7 +35,7 @@
                                 </div>
                             </li>
                             }
-                        <li class="nav-item dropdown">
+                        <li class="nav-item dropdown text-right">
                             <a class="nav-link text-dark dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 @User.Identity.Name
                             </a>
@@ -51,7 +51,7 @@
                         }
                         else {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Account" asp-action="SignInMethod">Log in</a>
+                                <a class="nav-link text-dark text-right" asp-controller="Account" asp-action="SignInMethod">Log in</a>
                         </li>
                         }
                     </ul>
