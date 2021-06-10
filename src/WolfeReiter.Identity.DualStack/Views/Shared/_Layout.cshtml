@@ -25,17 +25,17 @@
                             //@if (User.IsInRole(Roles.Administrator))
                             @if ((await AuthorizationService.AuthorizeAsync(User, Policies.Administration)).Succeeded)
                             {
-                            <li class="nav-item dropdown text-dark text-right">
-                                <a class="nav-link text-dark dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link text-dark dropdown-toggle" href="#" id="navbarAdminMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     Administration
                                 </a>
-                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                <div class="dropdown-menu" aria-labelledby="navbarAdminMenuLink">
                                     <a class="dropdown-item" asp-controller="Account" asp-action="New">Create New Account</a>
                                     <a class="dropdown-item" asp-controller="Account" asp-action="List">Manage User Accounts</a>
                                 </div>
                             </li>
                             }
-                        <li class="nav-item dropdown text-right">
+                        <li class="nav-item dropdown">
                             <a class="nav-link text-dark dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 @User.Identity.Name
                             </a>
@@ -50,7 +50,7 @@
                         </li>
                         }
                         else {
-                            <li class="nav=item">
+                            <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Account" asp-action="SignInMethod">Log in</a>
                         </li>
                         }
