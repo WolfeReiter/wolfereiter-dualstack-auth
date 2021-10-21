@@ -17,6 +17,8 @@ using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using WolfeReiter.Identity.Data;
 using WolfeReiter.Identity.DualStack.Security;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WolfeReiter.Identity.DualStack
 {
@@ -76,15 +78,6 @@ namespace WolfeReiter.Identity.DualStack
                 .AddDistributedTokenCaches();
             services.AddWolfeReiterAzureGroupsClaimsTransform(Configuration);
 
-            //override AuthenticationOptions set by AddMicrosoftIdentityWebAppAuthentication() 
-            //to allow sign-in with forms and cookies instead of as a side-effect of calling
-            //services.AddAuthentication(Action<AuthenticationOptions>). 
-            services.ConfigureAll<AuthenticationOptions>(options =>
-            {
-                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            });
-
             //IMvcBuilder.AddMicrosoftIdentityUI() sets AccessDeniedPath using ConfigureAll<T>.
             //Calling services.ConfigureApplicationCookie(Action<ConfigrationOptions>) doesn't work correctly because
             //AddMicrosoftIdentityUI() can't see that AccessDeniedPath was set through that mechanism.
@@ -100,6 +93,7 @@ namespace WolfeReiter.Identity.DualStack
                 options.AddPolicy(Policies.Administration,
                     policy => policy.RequireRole(Policies.RequiredRoles.Administration));
             });
+
 
             services.AddHealthChecks();
             services.AddControllersWithViews()
@@ -136,7 +130,12 @@ namespace WolfeReiter.Identity.DualStack
             app.UseStaticFiles();
             app.UseStatusCodePages();
             app.UseRouting();
-            app.UseAuthentication();
+            //replace app.UseAuthentication() with app.UseAllAuthenticationSchemes() in order to coexist
+            //OpenIdConnect authentication from services.AddMicrosoftIdentityWebAppAuthentication() 
+            //and Cookies authentication from login form to database.
+            //
+            //app.UseAuthentication();
+            app.UseAllAuthenticationSchemes();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

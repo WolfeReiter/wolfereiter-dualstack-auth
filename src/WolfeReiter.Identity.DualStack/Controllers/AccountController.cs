@@ -22,7 +22,6 @@ using WolfeReiter.Identity.DualStack.Security;
 
 namespace WolfeReiter.Identity.DualStack.Controllers
 {
-    [Authorize(Policy = Policies.Administration)]
     public class AccountController : Controller
     {
         private readonly IConfiguration Configuration;
@@ -433,12 +432,14 @@ namespace WolfeReiter.Identity.DualStack.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = Policies.Administration)]
         public IActionResult List()
         {
             return View();
         }
 
         [HttpGet]
+        [Authorize(Policy = Policies.Administration)]
         public async Task<IActionResult> New()
         {
             var roles = await DbContext.Roles
@@ -450,6 +451,7 @@ namespace WolfeReiter.Identity.DualStack.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = Policies.Administration)]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> New(NewUserViewModel model)
         {
@@ -492,6 +494,7 @@ namespace WolfeReiter.Identity.DualStack.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = Policies.Administration)]
         public async Task<IActionResult> Edit(Guid id, bool? created)
         {
             var user = await DbContext.Users.Where(x => x.UserId == id).SingleOrDefaultAsync();
@@ -521,6 +524,7 @@ namespace WolfeReiter.Identity.DualStack.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = Policies.Administration)]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(EditUserViewModel model)
         {
