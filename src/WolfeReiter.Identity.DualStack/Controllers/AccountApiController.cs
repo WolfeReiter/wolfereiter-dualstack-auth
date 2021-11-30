@@ -107,7 +107,7 @@ namespace WolfeReiter.Identity.DualStack.Controllers
             //sort order of the sorted column
             string sort   = Request.Query["order[0][dir]"].FirstOrDefault() ?? "asc";
             //search string from the search box enabled by the "searching" option
-            string search = Request.Query["search[value]"].FirstOrDefault();
+            string? search = Request.Query["search[value]"].FirstOrDefault();
 
             int pageSize = length;
             int skip = start;

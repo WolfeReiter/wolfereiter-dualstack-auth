@@ -17,7 +17,7 @@ namespace System.Security.Cryptography
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(xmlString);
 
-            if (xmlDoc.DocumentElement.Name.Equals("RSAKeyValue"))
+            if (xmlDoc.DocumentElement?.Name.Equals("RSAKeyValue") ?? false)
             {
                 foreach (XmlNode? node in xmlDoc.DocumentElement.ChildNodes)
                 {

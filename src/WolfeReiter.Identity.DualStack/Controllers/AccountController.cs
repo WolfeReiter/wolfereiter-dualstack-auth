@@ -58,7 +58,7 @@ namespace WolfeReiter.Identity.DualStack.Controllers
         [AllowAnonymous]
         public IActionResult Login(string? returnUrl)
         {
-            if (User.Identity.IsAuthenticated) return  RedirectFromLogin(returnUrl);
+            if (User.Identity?.IsAuthenticated ?? false) return  RedirectFromLogin(returnUrl);
 
             return View(new LoginViewModel { RedirectUrl = returnUrl });
         }
@@ -250,10 +250,11 @@ namespace WolfeReiter.Identity.DualStack.Controllers
             if (!EnableSelfEnrollment) throw new NotSupportedException("Self-enrollment is disabled.");
 
             if (!ModelState.IsValid) return View(model);
-            if (!string.IsNullOrEmpty(ValidSelfEnrollmentEmailPattern) && !Regex.IsMatch(model.Email, ValidSelfEnrollmentEmailPattern))
+            //if ModelState.IsValid then model.Email cannot be null.
+            if (!string.IsNullOrEmpty(ValidSelfEnrollmentEmailPattern) && !Regex.IsMatch(model.Email!, ValidSelfEnrollmentEmailPattern))
             {
                 ModelState.AddModelError("Email", $"Not permitted.");
-                ModelState.AddModelError("", $"\"{model.Email}\" is not permitted to register. You must use a pre-authorized address. Please contact the system administrator.");
+                ModelState.AddModelError("", $"\"{model.Email!}\" is not permitted to register. You must use a pre-authorized address. Please contact the system administrator.");
                 return View(model);
             }
 
@@ -407,7 +408,12 @@ namespace WolfeReiter.Identity.DualStack.Controllers
         [HttpGet]
         [AllowAnonymous]
         [Route("/Account/SignOut/")]
+#if NET6_0_OR_GREATER
+        //net6.0 defines SignedOut() in BaseController but it is non-async and has a different return type
+        public new async Task<IActionResult> SignOut()
+#else
         public async Task<IActionResult> SignOut()
+#endif
         {
             var schemes = new [] { CookieAuthenticationDefaults.AuthenticationScheme };
             var callbackUrl = Url.ActionLink("SignedOut");

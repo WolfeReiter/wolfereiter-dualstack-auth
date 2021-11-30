@@ -91,8 +91,8 @@ namespace System.Security.Cryptography
             rsa.ImportParameters(rsaKeys);
             signedData = Convert.FromBase64String(base64signed);
             //RSA Signature size is equal to the Modulus of the key.
-            signature = signedData.Take(rsaKeys.Modulus.Length).ToArray();
-            data = signedData.Skip(rsaKeys.Modulus.Length).ToArray();
+            signature = signedData.Take(rsaKeys.Modulus?.Length ?? 0).ToArray();
+            data = signedData.Skip(rsaKeys.Modulus?.Length ?? 0).ToArray();
             hashResult = hash.ComputeHash(data);
             plaintext = Encoding.UTF8.GetString(data);
             return rsa.VerifyHash(hashResult, signature, HashAlgorithmName, SignaturePadding);
