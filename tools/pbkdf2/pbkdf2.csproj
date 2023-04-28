@@ -1,12 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\WolfeReiter.Identity.DualStack\WolfeReiter.Identity.DualStack.csproj" />
+    <ProjectReference
+      Include="..\..\src\WolfeReiter.Identity.DualStack\WolfeReiter.Identity.DualStack.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp3.1;net6.0</TargetFrameworks>
+    <TargetFrameworks>net6.0</TargetFrameworks>
   </PropertyGroup>
-  
+
 </Project>
