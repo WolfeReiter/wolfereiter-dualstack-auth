@@ -35,7 +35,7 @@ namespace WolfeReiter.Identity.DualStack.Controllers
         int AccountLockoutMaxFailedAttempts => Configuration.GetValue<int>("Account:LockoutMaxFailedAttempts", 5);
         int TokenValidMinutes => Configuration.GetValue<int>("Account:TokenValidMinutes", 60);
         bool EnableSelfEnrollment => Configuration.GetValue<bool>("Account:EnableSelfEnrollment", false);
-        string ValidSelfEnrollmentEmailPattern => Configuration.GetValue<string>("Account:ValidSelfEnrollmentEmailPattern");
+        string ValidSelfEnrollmentEmailPattern => Configuration.GetValue<string>("Account:ValidSelfEnrollmentEmailPattern") ?? String.Empty;
 
         public AccountController(IConfiguration configuration, ILogger<AccountController> logger, IDistributedCache cache, 
             CryptoService crypto, SmtpClientService smtpClient, PgSqlContext pgContext, SqlServerContext sqlContext)

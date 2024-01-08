@@ -14,8 +14,8 @@ namespace WolfeReiter.Identity.DualStack.Security
         public CryptoService(IConfiguration configuration) 
         {
             Configuration = configuration; 
-            AesKey        = Convert.FromBase64String(Configuration.GetValue<string>("Cryptography:AesKey"));
-            RsaKeyPair    = Configuration.GetValue<string>("Cryptography:RsaKeyPair").DecodeBase64().RSAParametersFromXml();
+            AesKey        = Convert.FromBase64String(Configuration.GetValue<string>("Cryptography:AesKey") ?? string.Empty);
+            RsaKeyPair    = (Configuration.GetValue<string>("Cryptography:RsaKeyPair") ?? string.Empty ).DecodeBase64().RSAParametersFromXml();
             Cypher        = new TextCypher();
         }
         

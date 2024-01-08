@@ -81,7 +81,7 @@ namespace WolfeReiter.Identity.DualStack
                 {
                     UserId = sysadminUserId,
                     Name = "sysadmin",
-                    Email = Configuration.GetValue<string>("Setup:SysadminEmail"),
+                    Email = Configuration.GetValue<string>("Setup:SysadminEmail") ?? string.Empty,
                     // initial password is "password"
                     Hash = Convert.FromBase64String("HUl6Au5B3OeAbPkHXwwYfv3YSkMu6UecyHBGwDHghJI="),
                     Salt = Convert.FromBase64String("MDatqlpx8UcfpXmzdS3H0NFEe/iBCgr2xxJkBbOZ7+Q=")

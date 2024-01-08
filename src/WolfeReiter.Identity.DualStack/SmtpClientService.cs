@@ -15,13 +15,13 @@ namespace WolfeReiter.Identity.DualStack
             name: Configuration.GetValue<string>("Mail:System:FromName"),
             address: Configuration.GetValue<string>("Mail:System:FromAddress")
         );
-        string SmtpHost => Configuration.GetValue<string>("Mail:Smtp:Host", "localhost");
+        string SmtpHost => Configuration.GetValue<string>("Mail:Smtp:Host", "localhost") ?? string.Empty;
         int SmtpPort => Configuration.GetValue<int>("Mail:Smtp:Port", 25);
         SecureSocketOptions SmtpSecureSocketOptions => Configuration.GetValue<SecureSocketOptions>("Mail:Smtp:SecureSocketOptions", SecureSocketOptions.Auto);
         bool SmtpDisableCertificateValidation => Configuration.GetValue<bool>("Mail:Smtp:DisableCertificateValidation", false);
         bool SmtpAuthenticate => Configuration.GetValue<bool>("Mail:Smtp:Authenticate", false);
-        string SmtpAuthenticationUsername => Configuration.GetValue<string>("Mail:Smtp:Authentication:Username", string.Empty);
-        string SmtpAuthenticationPassword => Configuration.GetValue<string>("Mail:Smtp:Authentication:Password", string.Empty);
+        string SmtpAuthenticationUsername => Configuration.GetValue<string>("Mail:Smtp:Authentication:Username", string.Empty) ?? string.Empty;
+        string SmtpAuthenticationPassword => Configuration.GetValue<string>("Mail:Smtp:Authentication:Password", string.Empty) ?? string.Empty;
 
         public SmtpClientService(IConfiguration configuration)
         {
